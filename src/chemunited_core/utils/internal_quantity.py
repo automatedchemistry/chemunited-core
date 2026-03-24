@@ -1,7 +1,6 @@
 from pydantic_pint import PydanticPintQuantity
 from pint import Quantity, UnitRegistry
 
-
 ureg: UnitRegistry = UnitRegistry()
 
 
@@ -68,7 +67,7 @@ class ChemUnitQuantity(Quantity):
         result = super().__add__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __radd__(self, other):  # type:ignore[override]
+    def __radd__(self, other):  # type: ignore[override]
         return self.__add__(other)
 
     # ----------- SUBTRACTION (a - b) -----------
@@ -95,7 +94,7 @@ class ChemUnitQuantity(Quantity):
         result = super().__mul__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __rmul__(self, other):  # type:ignore[override]
+    def __rmul__(self, other):  # type: ignore[override]
         return self.__mul__(other)
 
     # ----------- DIVISION (a / b) -----------

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from ..common.enums import ConnectionType
 from ..connections import EdgeData
-from ..utils.internal_qunatity import ChemUnitQuantity
+from ..utils.internal_quantity import ChemUnitQuantity
 
 
 @dataclass
@@ -14,14 +14,14 @@ class Port:
     @property
     def name(self):
         return f"{self.component}.{self.number}"
-    
+
 
 @dataclass
 class InternalEdge(EdgeData):
-    classification = ConnectionType.FLOW
-    origin="INTERNAL"
-    destination="INTERNAL"
-    origin_port=1
-    destination_port=2
-    length = ChemUnitQuantity("1 mm")
-    diameter = ChemUnitQuantity("1 mm")
+    classification: ConnectionType = ConnectionType.FLOW
+    origin: str = "INTERNAL"
+    destination: str = "INTERNAL"
+    origin_port: int = 1
+    destination_port: int = 2
+    length: ChemUnitQuantity = ChemUnitQuantity("1 mm")
+    diameter: ChemUnitQuantity = ChemUnitQuantity("1 mm")

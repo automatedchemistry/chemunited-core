@@ -1,5 +1,5 @@
 from ..common.enums import GroupParameterCategory
-from ..utils.internal_qunatity import ChemQuantityValidator, ChemUnitQuantity
+from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 from .component import ComponentData, ComponentMode
 from .internals import Port, InternalEdge
 from dataclasses import dataclass
@@ -10,6 +10,7 @@ import numpy as np
 
 class PlugFlowMode(ComponentMode):
     """Concrete mode alias for differential volumetric components."""
+
     length: Annotated[ChemUnitQuantity, ChemQuantityValidator("mm")] = Field(
         default=ChemUnitQuantity("100 mm"),
         title="Length",
@@ -26,16 +27,18 @@ class PlugFlowMode(ComponentMode):
             "group": GroupParameterCategory.PROPERTY.value,
         },
     )
-    
+
+
 @dataclass
 class PlugFlowComponentData(ComponentData):
-    """Concrete mode alias for differential volumetric components."""
+    """Runtime dataclass for plug-flow (tubular) reactor components."""
+
     length: ChemUnitQuantity
     diameter: ChemUnitQuantity
 
     @property
     def capacity(self) -> float:
-        return self.length * np.pi * self.diameter**2 / 4  # m**3
+        return self.length_value * np.pi * self.diameter**2 / 4  # m**3
 
     @property
     def length_value(self) -> float:
@@ -49,16 +52,15 @@ class PlugFlowComponentData(ComponentData):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name),
-            2: Port(number=2, component=self.name)
+            2: Port(number=2, component=self.name),
         }
         self.internal_edges = {
-        (1, 2): InternalEdge(
-            origin=self.name,
-            destination=self.name,
-            origin_port=1,
-            destination_port=2,
-            length=ChemUnitQuantity("1 mm"),
-            diameter=ChemUnitQuantity("1 mm"),
+            (1, 2): InternalEdge(
+                origin=self.name,
+                destination=self.name,
+                origin_port=1,
+                destination_port=2,
+                length=self.length,
+                diameter=self.diameter,
             )
         }
-

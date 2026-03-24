@@ -61,9 +61,11 @@ class ComponentData(Element):
     position: tuple[float, float]
     angle: int
     COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.ELECTRONIC
-    port_pairs: list[tuple[int, int]] = field(default_factory=list, init=False)
+    port_pairs: list[tuple[int, ...]] = field(default_factory=list, init=False)
     ports_by_number: dict[int, Port] = field(default_factory=dict, init=False)
-    internal_edges: dict[EdgeKey, InternalEdge] = field(default_factory=dict, init=False)
+    internal_edges: dict[EdgeKey, InternalEdge] = field(
+        default_factory=dict, init=False
+    )
 
     """ Properties """
 
@@ -79,18 +81,15 @@ class ComponentData(Element):
 
     def __post_init__(self):
         self.internal_structure()
-    
+
     def internal_structure(self):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name),
-            2: Port(number=2, component=self.name)
+            2: Port(number=2, component=self.name),
         }
 
 
 @dataclass
 class NeutralComponentData(ComponentData):
-    def __post_init__(self):
-        ...
-
-
+    def __post_init__(self): ...

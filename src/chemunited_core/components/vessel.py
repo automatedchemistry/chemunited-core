@@ -3,10 +3,11 @@ from typing import Annotated
 from pydantic import Field
 
 from ..common.enums import GroupParameterCategory, ConnectionType
-from ..utils.quantity import ChemQuantityValidator, ChemUnitQuantity
+from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 from .component import ComponentData, ComponentMode
 from .enums import ComponentType
 from .internals import Port
+
 
 class VesselMode(ComponentMode):
     capacity: Annotated[ChemUnitQuantity, ChemQuantityValidator("ml")] = Field(
@@ -14,7 +15,7 @@ class VesselMode(ComponentMode):
         title="Component Capacity",
         description="Volumetric capacity of the component",
         json_schema_extra={
-            "group": GroupParameterCategory.STATUS.value,
+            "group": GroupParameterCategory.PROPERTY.value,
         },
     )
     top_access: int = Field(
@@ -51,9 +52,13 @@ class VesselComponentData(ComponentData):
     @property
     def capacity_value(self) -> float:
         return self.capacity.to_base_units().magnitude
-    
+
     def internal_structure(self):
         n = self.top_access + self.bottom_access
         self.port_pairs = [(i + 1,) for i in range(n + 1)]
-        self.port_pairs = {i + 1: Port(number=i + 1, component=self.name) for i in range(n)}
-        self.port_pairs[n + 1] = Port(number=n + 1, component=self.name, category=ConnectionType.HEAT)
+        self.ports_by_number = {
+            i + 1: Port(number=i + 1, component=self.name) for i in range(n)
+        }
+        self.ports_by_number[n + 1] = Port(
+            number=n + 1, component=self.name, category=ConnectionType.HEAT
+        )

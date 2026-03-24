@@ -12,4 +12,3 @@ class ConnectionType(StrEnum):
     MOVEMENT = "movement"
     HEAT = "heat"
     ELECTRONIC = "electronic"
-

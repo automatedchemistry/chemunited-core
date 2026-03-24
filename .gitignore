@@ -201,3 +201,5 @@ cython_debug/
 .vscode/
 
 AGENTS.md
+CLAUDE.md
+.claude/
