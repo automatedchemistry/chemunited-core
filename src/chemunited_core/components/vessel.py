@@ -53,7 +53,7 @@ class VesselComponentData(ComponentData):
     def capacity_value(self) -> float:
         return self.capacity.to_base_units().magnitude
 
-    def internal_structure(self):
+    def internal_structure(self, update: bool = False):
         n = self.top_access + self.bottom_access
         self.port_pairs = [(i + 1,) for i in range(n + 1)]
         self.ports_by_number = {

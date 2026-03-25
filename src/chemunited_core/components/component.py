@@ -82,7 +82,9 @@ class ComponentData(Element):
     def __post_init__(self):
         self.internal_structure()
 
-    def internal_structure(self):
+    def internal_structure(self, update: bool = False):
+        if update:
+            return
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name),

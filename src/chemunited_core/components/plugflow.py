@@ -48,7 +48,10 @@ class PlugFlowComponentData(ComponentData):
     def diameter_value(self) -> float:
         return self.diameter.to_base_units().magnitude
 
-    def internal_structure(self):
+    def internal_structure(self, update: bool = False):
+        if update:
+            self.internal_edges[(1, 2)].length = self.length
+            self.internal_edges[(1, 2)].length = self.diameter
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name),

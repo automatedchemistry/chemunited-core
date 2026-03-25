@@ -25,3 +25,10 @@ class InternalEdge(EdgeData):
     destination_port: int = 2
     length: ChemUnitQuantity = ChemUnitQuantity("1 mm")
     diameter: ChemUnitQuantity = ChemUnitQuantity("1 mm")
+
+
+@dataclass
+class Inventory(Port):
+    volume: float = 1e-6
+    
+

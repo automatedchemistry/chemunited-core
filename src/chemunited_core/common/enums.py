@@ -12,3 +12,13 @@ class ConnectionType(StrEnum):
     MOVEMENT = "movement"
     HEAT = "heat"
     ELECTRONIC = "electronic"
+
+
+class PhaseKind(StrEnum):
+    LIQUID = "liquid"
+    GAS = "gas"
+
+
+class BoundaryConditionKind(StrEnum):
+    NONE = "none"
+    PRESSURE = "pressure"
