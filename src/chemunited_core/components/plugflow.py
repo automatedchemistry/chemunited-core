@@ -1,11 +1,13 @@
+from dataclasses import dataclass
+from typing import Annotated
+
+import numpy as np
+from pydantic import Field
+
 from ..common.enums import GroupParameterCategory
 from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 from .component import ComponentData, ComponentMode
-from .internals import Port, InternalEdge
-from dataclasses import dataclass
-from typing import Annotated
-from pydantic import Field
-import numpy as np
+from .internals import InternalEdge, Port
 
 
 class PlugFlowMode(ComponentMode):
@@ -50,20 +52,19 @@ class PlugFlowComponentData(ComponentData):
 
     def internal_structure(self, update: bool = False):
         if update:
-            self.internal_edges[(1, 2)].length = self.length
-            self.internal_edges[(1, 2)].length = self.diameter
+            self.internal_edges[(1, 2)].length = self.length_value
+            self.internal_edges[(1, 2)].diameter = self.diameter_value
+            return
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
-            1: Port(number=1, component=self.name),
-            2: Port(number=2, component=self.name),
+            1: Port(number=1, component=self.name, relative_position=(-1, 0)),
+            2: Port(number=2, component=self.name, relative_position=(1, 0)),
         }
         self.internal_edges = {
             (1, 2): InternalEdge(
-                origin=self.name,
-                destination=self.name,
                 origin_port=1,
                 destination_port=2,
-                length=self.length,
-                diameter=self.diameter,
+                length=self.length_value,
+                diameter=self.diameter_value,
             )
         }

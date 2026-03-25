@@ -1,5 +1,5 @@
-from pydantic_pint import PydanticPintQuantity
 from pint import Quantity, UnitRegistry
+from pydantic_pint import PydanticPintQuantity
 
 ureg: UnitRegistry = UnitRegistry()
 

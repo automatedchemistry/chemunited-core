@@ -1,14 +1,15 @@
 from dataclasses import dataclass, field
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from ..common.enums import GroupParameterCategory
-from ..common.metadata import Element
-from .enums import ComponentType
-from .internals import Port, InternalEdge
+from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.common.metadata import Element
 
-EdgeKey = tuple[int, int]
+from .enums import ComponentType
+from .internals import InternalEdge, InventoryNode, Port
+
+EdgeKey = tuple[int, int | Literal["Inventory"]]
 
 
 class ComponentMode(BaseModel, populate_by_name=True):
@@ -66,6 +67,7 @@ class ComponentData(Element):
     internal_edges: dict[EdgeKey, InternalEdge] = field(
         default_factory=dict, init=False
     )
+    internal_inventory: InventoryNode | None = field(default=None, init=False)
 
     """ Properties """
 
@@ -87,8 +89,8 @@ class ComponentData(Element):
             return
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
-            1: Port(number=1, component=self.name),
-            2: Port(number=2, component=self.name),
+            1: Port(number=1, component=self.name, relative_position=(-1, 0)),
+            2: Port(number=2, component=self.name, relative_position=(1, 0)),
         }
 
 

@@ -196,6 +196,7 @@ cython_debug/
 
 # Test temporary files
 .new_project_example/
+examples/output/
 
 # vscode settings
 .vscode/

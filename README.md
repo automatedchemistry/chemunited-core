@@ -14,7 +14,7 @@ Requires Python ≥ 3.11.
 pip install chemunited-core
 ```
 
-For development (includes `pytest` and `pytest-cov`):
+For development (includes `pytest`, `pytest-cov`, `black`, `ruff`, `mypy`, and `pre-commit`):
 
 ```bash
 pip install -e ".[dev]"
@@ -177,7 +177,7 @@ pytest --cov
 pytest tests/test_from_mode.py
 ```
 
-Pre-commit hooks (Black formatter + general checks) are configured in `.pre-commit-config.yaml`:
+Pre-commit hooks (Ruff lint/import sorting, Black formatting, mypy, and general checks) are configured in `.pre-commit-config.yaml`:
 
 ```bash
 pip install pre-commit

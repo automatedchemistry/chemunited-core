@@ -1,6 +1,7 @@
 from dataclasses import MISSING, dataclass, fields, is_dataclass
-from pydantic import BaseModel
 from typing import Self
+
+from pydantic import BaseModel
 
 
 @dataclass

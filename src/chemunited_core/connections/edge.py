@@ -183,7 +183,7 @@ class EdgeData(Element):
 
     @property
     def capacity(self) -> float:
-        """ capacity in SI """
+        """capacity in SI"""
         return self.length_value * np.pi * self.diameter**2 / 4  # m**3
 
     @property

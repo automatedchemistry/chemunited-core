@@ -1,6 +1,7 @@
 from .component import ComponentData, ComponentMode, NeutralComponentData
-from .vessel import VesselComponentData, VesselMode
 from .plugflow import PlugFlowComponentData, PlugFlowMode
+from .valve import ValveComponentData
+from .vessel import VesselComponentData, VesselMode
 
 __all__ = [
     "ComponentData",
@@ -8,6 +9,7 @@ __all__ = [
     "NeutralComponentData",
     "PlugFlowComponentData",
     "PlugFlowMode",
+    "ValveComponentData",
     "VesselComponentData",
     "VesselMode",
 ]
