@@ -95,7 +95,7 @@ class EdgeMode(BaseModel, populate_by_name=True):
     )
     # classification
     classification: ConnectionType = Field(
-        default=ConnectionType.FLOW,
+        default=ConnectionType.HYDRAULIC,
         title="Classification",
         description="Connection classification on the platform",
         json_schema_extra={
@@ -147,7 +147,7 @@ class EdgeMode(BaseModel, populate_by_name=True):
     @model_validator(mode="after")
     def check_flow_rules(self) -> "EdgeMode":
         """Ensure that non-flow connections have length and diameter set to 0."""
-        if self.classification != ConnectionType.FLOW:
+        if self.classification != ConnectionType.HYDRAULIC:
             self.length = ChemUnitQuantity("0 mm")
             self.diameter = ChemUnitQuantity("0 mm")
 

@@ -1,3 +1,14 @@
+"""Vessel component — closed storage container with top and bottom port access.
+
+Represents flasks, reactors, and any closed vessel that holds liquid and gas
+simultaneously. Compiles into a star subgraph where all hydraulic ports connect
+to a single InventoryNode via JUNCTION edges.
+
+GUI: exposes capacity, top_access, and bottom_access in the properties widget.
+Sim: DigitalTwinAdapter reads InventoryNode initial conditions to seed runtime
+     phase inventories; port access (TOP/BOTTOM) is available for future
+     phase-preferential routing extensions.
+"""
 from dataclasses import dataclass
 from typing import Annotated
 
@@ -20,6 +31,11 @@ from .internals import InternalEdge, InventoryNode, Port
 
 
 class VesselMode(ComponentMode):
+    """User-configurable parameters for a vessel component.
+    capacity     — total geometric volume of the vessel.
+    top_access   — number of hydraulic ports at the top (gas side).
+    bottom_access — number of hydraulic ports at the bottom (liquid side).
+    """
     capacity: Annotated[ChemUnitQuantity, ChemQuantityValidator("ml")] = Field(
         default=ChemUnitQuantity("1 ml"),
         title="Component Capacity",
@@ -59,6 +75,15 @@ def _centered_offsets(count: int) -> list[float]:
 
 @dataclass
 class VesselComponentData(ComponentData):
+    """Structural definition of a closed vessel with phase-separated inventory.
+
+    Internal subgraph: each hydraulic port connects to one InventoryNode
+    via a JUNCTION edge. The inventory node holds separate initial conditions
+    for liquid and gas phases — both are seeded from capacity at construction
+    (all gas, no liquid by default).
+
+    A HEAT port is always added as the last port for thermal connections.
+    """
     COMPONENT_TYPE = ComponentType.UTENSIL
     capacity: ChemUnitQuantity
     top_access: int
@@ -68,7 +93,7 @@ class VesselComponentData(ComponentData):
     def capacity_value(self) -> float:
         return self.capacity.to_base_units().magnitude
 
-    def internal_structure(self, update: bool = False):
+    def internal_structure(self):
         n = self.top_access + self.bottom_access
         self.port_pairs = [(i + 1,) for i in range(n + 1)]
         self.ports_by_number = {}
@@ -113,3 +138,6 @@ class VesselComponentData(ComponentData):
                 volume=0, phase_kind=PhaseKind.LIQUID
             ),  # init empty
         )
+
+    def sync_internal_state(self):
+        self.internal_inventory.gas_content.volume = self.capacity_value

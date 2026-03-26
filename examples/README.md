@@ -12,9 +12,13 @@ python examples/build_valve_graph.py
 
 The script builds a small flow setup with:
 
+- a flow source
+- a pressure control node
 - a feed vessel
+- a junction
 - a selector valve
 - a plug-flow reactor
+- a back-pressure regulator
 - a product vessel
 - a waste vessel
 

@@ -8,7 +8,7 @@ class GroupParameterCategory(StrEnum):
 
 
 class ConnectionType(StrEnum):
-    FLOW = "flow"
+    HYDRAULIC = "hydraulic"
     MOVEMENT = "movement"
     HEAT = "heat"
     ELECTRONIC = "electronic"
@@ -17,8 +17,3 @@ class ConnectionType(StrEnum):
 class PhaseKind(StrEnum):
     LIQUID = "liquid"
     GAS = "gas"
-
-
-class BoundaryConditionKind(StrEnum):
-    NONE = "none"
-    PRESSURE = "pressure"

@@ -1,3 +1,14 @@
+"""Plug-flow transport component — tube, capillary, or flow reactor channel.
+
+Represents any tubular element where material travels as an ordered plug
+without mixing. Compiles into a single TRANSPORT edge between two ports.
+Hydraulic resistance is computed by the sim solver from length and diameter
+using the Hagen-Poiseuille equation.
+
+GUI: exposes length and diameter in the properties widget.
+Sim: InternalEdge.length and diameter are the primary inputs to the
+     resistance calculation and the parcel travel-time estimate.
+"""
 from dataclasses import dataclass
 from typing import Annotated
 
@@ -11,8 +22,10 @@ from .internals import InternalEdge, Port
 
 
 class PlugFlowMode(ComponentMode):
-    """Concrete mode alias for differential volumetric components."""
-
+    """User-configurable geometry for a plug-flow component.
+    length   — channel length (default 100 mm).
+    diameter — channel inner diameter (default 1 mm).
+    """
     length: Annotated[ChemUnitQuantity, ChemQuantityValidator("mm")] = Field(
         default=ChemUnitQuantity("100 mm"),
         title="Length",
@@ -33,8 +46,12 @@ class PlugFlowMode(ComponentMode):
 
 @dataclass
 class PlugFlowComponentData(ComponentData):
-    """Runtime dataclass for plug-flow (tubular) reactor components."""
+    """Structural definition of a tubular plug-flow element.
 
+    Internal subgraph: one TRANSPORT edge between port 1 (inlet) and
+    port 2 (outlet). Edge length and diameter are updated by
+    sync_internal_state() when the user changes geometry in the GUI.
+    """
     length: ChemUnitQuantity
     diameter: ChemUnitQuantity
 
@@ -50,11 +67,7 @@ class PlugFlowComponentData(ComponentData):
     def diameter_value(self) -> float:
         return self.diameter.to_base_units().magnitude
 
-    def internal_structure(self, update: bool = False):
-        if update:
-            self.internal_edges[(1, 2)].length = self.length_value
-            self.internal_edges[(1, 2)].diameter = self.diameter_value
-            return
+    def internal_structure(self):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name, relative_position=(-1, 0)),
@@ -68,3 +81,8 @@ class PlugFlowComponentData(ComponentData):
                 diameter=self.diameter_value,
             )
         }
+
+    def sync_internal_state(self):
+        edge = self.internal_edges.get((1, 2))
+        edge.length = self.length_value
+        edge.diameter = self.diameter_value

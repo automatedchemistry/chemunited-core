@@ -1,11 +1,29 @@
+"""Rotary valve component — multi-position switching element.
+
+Models any rotary valve (injection, distribution, multiposition) using a
+geometric stator/rotor representation. All possible internal channels are
+compiled into the subgraph at construction; only the channels corresponding
+to the current rotor position are open (resistance computed from geometry).
+All other channels are closed (resistance = R_MAX_HYDRAULIC).
+
+GUI: stator_ports and rotor_ports define the valve geometry and are not
+     user-editable after component creation.
+Sim: sync_internal_state() re-derives active connections from the current
+     rotor layout; the DigitalTwinAdapter reads InternalEdge.is_active to
+     build the active hydraulic assembly each time step.
+"""
 from copy import copy
 from dataclasses import dataclass, field
 from typing import TypeAlias
 
-from .component import ComponentData
+import numpy as np
+from pydantic import Field
+
+from chemunited_core.common.enums import GroupParameterCategory
+
+from .component import ComponentData, ComponentMode
 from .enums import ComponentType, InternalEdgeRole
 from .internals import InternalEdge, Port
-import numpy as np
 
 ValvePortRow: TypeAlias = tuple[int | None, ...]
 ValvePortLayout: TypeAlias = list[ValvePortRow]
@@ -86,17 +104,44 @@ def possibles_connections_pairs(
 
 
 def _port_numbers_from_stator(stator_ports: ValvePortLayout) -> list[int]:
-    numbers = {
-        number
-        for row in stator_ports
-        for number in row
-        if number is not None
-    }
+    numbers = {number for row in stator_ports for number in row if number is not None}
     return sorted(numbers)
+
+
+class ValveMode(ComponentMode):
+    """Valve geometry parameters — not editable after component creation.
+    stator_ports — layout of external ports on the valve body.
+    rotor_ports  — rotor channel layout used to derive active connections.
+    """
+    stator_ports: ValvePortLayout = Field(
+        default_factory=lambda: _copy_port_layout(DEFAULT_STATOR_PORTS),
+        title="Valve stator ports",
+        description="External stator port layout for the valve body.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+            "editable": False,
+        },
+    )
+    rotor_ports: ValvePortLayout = Field(
+        default_factory=lambda: _copy_port_layout(DEFAULT_ROTOR_PORTS),
+        title="Valve rotor ports",
+        description="Rotor channel layout used to derive possible connections.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+            "editable": False,
+        },
+    )
 
 
 @dataclass
 class ValveComponentData(ComponentData):
+    """Structural definition of a rotary valve.
+
+    Derives all possible port connections geometrically from stator/rotor
+    layouts. Active connections reflect the current rotor position.
+    Switching is performed by calling sync_internal_state() after updating
+    the rotor layout — the sim adapter calls this on each protocol switch command.
+    """
     COMPONENT_TYPE = ComponentType.UTENSIL
     # Internally properties (It will be overwritten according to the valve topology)
     stator_ports: ValvePortLayout = field(
@@ -107,12 +152,7 @@ class ValveComponentData(ComponentData):
     )
     internal_radius = 1
 
-    def internal_structure(self, update: bool = False):
-        if update:
-            self.port_pairs.clear()
-            self.ports_by_number.clear()
-            self.internal_edges.clear()
-
+    def internal_structure(self):
         connections = possibles_connections_pairs(
             stator_ports=self.stator_ports,
             rotor_ports=self.rotor_ports,
@@ -128,8 +168,7 @@ class ValveComponentData(ComponentData):
                 origin_port=pair[0],
                 destination_port=pair[1],
                 role=InternalEdgeRole.JUNCTION,
-                active=False,
-            )
+            ).close()
             for pair in connections
         }
 
@@ -138,7 +177,7 @@ class ValveComponentData(ComponentData):
             rotor_ports=self.rotor_ports,
         )
         for pair in active_connections:
-            self.internal_edges[pair].active = True
+            self.internal_edges[pair].open()
 
         # Correct of the position of the ports
         n = len(self.stator_ports[0])
@@ -150,3 +189,14 @@ class ValveComponentData(ComponentData):
                     self.internal_radius * np.cos(phi),
                     self.internal_radius * np.sin(phi),
                 )
+
+    def sync_internal_state(self):
+        for edge in self.internal_edges.values():
+            edge.close()
+
+        _, active_connections = connection_from_rotor(
+            stator_ports=self.stator_ports,
+            rotor_ports=self.rotor_ports,
+        )
+        for pair in active_connections:
+            self.internal_edges[pair].open()
