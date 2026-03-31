@@ -96,10 +96,10 @@ class ComponentData(Element):
         internal_edges:     Internal channels keyed by (origin, destination).
         internal_inventory: Lumped control volume; None for non-storage components.
     """
-    name: str
-    figure: str
-    position: tuple[float, float]
-    angle: int
+    name: str = ""
+    figure: str = ""
+    position: tuple[float, float] = (0, 0)
+    angle: int = 0
     COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.ELECTRONIC
     port_pairs: list[tuple[int, ...]] = field(default_factory=list, init=False)
     ports_by_number: dict[int, Port] = field(default_factory=dict, init=False)
