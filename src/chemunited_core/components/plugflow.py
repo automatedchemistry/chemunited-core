@@ -15,8 +15,8 @@ from typing import Annotated
 import numpy as np
 from pydantic import Field
 
-from ..common.enums import GroupParameterCategory
-from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
+from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 from .component import ComponentData, ComponentMode
 from .internals import InternalEdge, Port
 
@@ -52,8 +52,8 @@ class PlugFlowComponentData(ComponentData):
     port 2 (outlet). Edge length and diameter are updated by
     sync_internal_state() when the user changes geometry in the GUI.
     """
-    length: ChemUnitQuantity
-    diameter: ChemUnitQuantity
+    length: ChemUnitQuantity = ChemUnitQuantity("100 mm")
+    diameter: ChemUnitQuantity = ChemUnitQuantity("1 mm")
 
     @property
     def capacity(self) -> float:
