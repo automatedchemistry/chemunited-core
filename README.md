@@ -1,211 +1,223 @@
 # chemunited-core
 
-> Core data models for orchestration, execution, and simulation of protocols in automated chemistry laboratory platforms.
+Core data models for orchestration, execution, and simulation of automated chemistry platforms.
 
-`chemunited-core` is the foundational layer upon which upper-level orchestration, execution, and simulation packages are built. It defines the canonical data structures for process equipment, connections, and physical quantities used across the ChemUnited ecosystem.
-
----
+`chemunited-core` is the shared schema and runtime-model layer for the ChemUnited stack. It gives downstream packages a consistent way to describe equipment, inter-component connections, internal topology, and unit-aware physical quantities.
 
 ## Installation
 
-Requires Python ≥ 3.11.
+Requires Python `>=3.11`.
 
 ```bash
 pip install chemunited-core
 ```
 
-For development (includes `pytest`, `pytest-cov`, `black`, `ruff`, `mypy`, and `pre-commit`):
+For local development:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
----
-
 ## Architecture
 
-The library uses a consistent **two-layer pattern** throughout:
+The editable architecture diagram lives at [docs/chemunited-core-architecture.drawio](docs/chemunited-core-architecture.drawio).
 
+The package follows one core pattern everywhere:
+
+```text
+Pydantic *Mode -> Element.from_mode(...) -> dataclass *Data -> consumer package
+                                   |
+                                   +-> Element.update(...) -> sync_internal_state()
 ```
-Pydantic model (*Mode)  →  from_mode()  →  Dataclass (*Data)
-     validation                bridge          runtime data
-```
 
-- **`*Mode` classes** — Pydantic models that validate and parse user input.
-- **`*Data` classes** — Python dataclasses used at runtime, constructed via the `from_mode()` factory.
-- **`Element.from_mode(mode)`** — the bridge method inherited by every `*Data` class. It validates that all required fields are present in the model before constructing the dataclass.
+- `*Mode` classes validate config, UI, or protocol input.
+- `*Data` classes hold the runtime representation used by orchestration, visualization, or simulation layers.
+- `Element.from_mode(mode)` builds fully initialized dataclass instances.
+- `Element.update(mode)` applies only explicitly provided fields, then refreshes derived runtime state through `sync_internal_state()`.
 
----
+## Public API
 
-## Modules
+Import public symbols from subpackages such as `chemunited_core.components` and `chemunited_core.connections`. There is currently no single top-level export module intended to be the main public surface.
 
-### `chemunited_core.components`
+| Module | Purpose | Main public objects |
+| --- | --- | --- |
+| `chemunited_core.components` | Process equipment models | `ComponentMode`, `ComponentData`, `FlowSourceMode`, `FlowSourceData`, `JunctionMode`, `JunctionData`, `PlugFlowMode`, `PlugFlowComponentData`, `PressureControlMode`, `PressureControlData`, `BackPressureRegulatorMode`, `BackPressureRegulatorData`, `ValveMode`, `ValveComponentData`, `VesselMode`, `VesselComponentData` |
+| `chemunited_core.connections` | Inter-component edges | `EdgeMode`, `EdgeData`, `ConnectionType` |
+| `chemunited_core.common` | Shared enums and mode-to-data bridge | `Element`, `ConnectionType`, `GroupParameterCategory` |
+| `chemunited_core.utils` | Unit-aware physical quantities | `ChemUnitQuantity`, `ChemQuantityValidator`, `ureg` |
+| `chemunited_core.compounds` | Inventory payload objects | `VolumeContentBase` |
 
-Process equipment definitions.
+## Component Catalog
 
-| Class | Type | Description |
-|---|---|---|
-| `ComponentMode` | Pydantic model | Base component input model (name, figure, position, angle) |
-| `ComponentData` | Dataclass | Base runtime component; 1 port pair `(1, 2)` by default |
-| `NeutralComponentData` | Dataclass | Component variant that skips port initialization |
-| `VesselMode` | Pydantic model | Vessel input model (capacity, top/bottom access ports) |
-| `VesselComponentData` | Dataclass | Vessel with volumetric capacity; n+1 ports (top + bottom + 1 heat port) |
-| `PlugFlowMode` | Pydantic model | Tubular reactor input model (length, diameter) |
-| `PlugFlowComponentData` | Dataclass | Plug-flow reactor; capacity calculated as `length × π × diameter² / 4` |
+| Model pair | Role | Runtime topology |
+| --- | --- | --- |
+| `ComponentMode` / `ComponentData` | Base component contract | Two hydraulic ports by default, no inventory |
+| `FlowSourceMode` / `FlowSourceData` | Fixed-flow boundary | One hydraulic port with a `FLOW` boundary condition |
+| `PressureControlMode` / `PressureControlData` | Fixed-pressure boundary | One hydraulic port with a `PRESSURE` boundary condition |
+| `PlugFlowMode` / `PlugFlowComponentData` | Tube or reactor channel | Two hydraulic ports joined by one transport edge |
+| `JunctionMode` / `JunctionData` | Splitter or combiner | N external ports connected to hub port `0` through junction edges |
+| `ValveMode` / `ValveComponentData` | Rotary switching element | All possible internal routes are compiled; only active routes stay open |
+| `BackPressureRegulatorMode` / `BackPressureRegulatorData` | Pressure-controlled inline valve | Two ports joined by a normally closed internal edge |
+| `VesselMode` / `VesselComponentData` | Storage and phase inventory | Top and bottom hydraulic ports plus one heat port and one inventory node |
 
-### `chemunited_core.connections`
+## Consumer Contract
 
-Directed edges between component ports.
+Another package can safely rely on the following behavior:
 
-| Class | Type | Description |
-|---|---|---|
-| `EdgeMode` | Pydantic model | Connection input model with origin/destination ports and physical geometry |
-| `EdgeData` | Dataclass | Runtime connection; carries `classification`, `length`, `diameter`, `capacity` |
+- `Element.from_mode(mode)` accepts a Pydantic model and returns the matching dataclass with derived runtime fields already built.
+- `Element.update(mode)` patches only fields explicitly set on the incoming mode object and then calls `sync_internal_state()`.
+- Every `ComponentData` instance exposes `name`, `figure`, `position`, `angle`, `component_type`, `port_pairs`, `ports_by_number`, `internal_edges`, and `internal_inventory`.
+- `ports_by_number` contains `Port` objects with stable fields such as `number`, `component`, `category`, `relative_position`, `access`, `closure`, and optional `boundary`.
+- `internal_edges` contains `InternalEdge` objects keyed by `(origin_port, destination_port)` or `(origin_port, "Inventory")`.
+- `internal_inventory` is either `None` or an `InventoryNode` that stores `liq_content` and `gas_content`.
+- `EdgeData` exposes `origin`, `destination`, `origin_port`, `destination_port`, `classification`, `length`, `diameter`, `straight_path`, and `air_pressure_line`.
+- `EdgeData.name` is a stable identifier in the form `<origin>_<origin_port>_<destination>_<destination_port>`.
+- `ChemUnitQuantity` stores unit-aware values. Use `.to_base_units().magnitude` when your consumer needs SI floats.
+- Non-hydraulic `EdgeMode` classifications normalize `length` and `diameter` to `0 mm`.
+- `EdgeMode` accepts `destiny` and `destiny_port` as aliases for backward compatibility.
 
-**Constraint**: non-`FLOW` connections (`MOVEMENT`, `HEAT`, `ELECTRONIC`) automatically enforce `length = 0 mm` and `diameter = 0 mm`.
+## Using It From Another Package
 
-**Field aliasing**: `EdgeMode` accepts `destiny` as an alias for `destination` and `destiny_port` as an alias for `destination_port`.
-
-### `chemunited_core.common`
-
-Shared enums and the base class.
+Create validated `*Mode` objects, compile them to `*Data`, then read the runtime topology.
 
 ```python
-class ConnectionType(StrEnum):
-    FLOW       = "flow"
-    MOVEMENT   = "movement"
-    HEAT       = "heat"
-    ELECTRONIC = "electronic"
-
-class GroupParameterCategory(StrEnum):
-    GENERAL  = "General"
-    PROPERTY = "Property"
-    STATUS   = "Status"
-```
-
-### `chemunited_core.utils`
-
-Unit-aware physical quantities via [Pint](https://pint.readthedocs.io/).
-
-| Name | Description |
-|---|---|
-| `ChemUnitQuantity` | Custom `Quantity` subclass with arithmetic and unit preservation |
-| `ChemQuantityValidator` | Pydantic validator wrapper for `ChemUnitQuantity` fields |
-| `ureg` | Shared `UnitRegistry` instance — always use this for unit operations |
-
----
-
-## Usage
-
-### Creating a component
-
-```python
-from chemunited_core.components import ComponentMode, ComponentData
-
-mode = ComponentMode(name="Pump A", figure="PumpFigure", position=(0.0, 0.0), angle=0)
-component = ComponentData.from_mode(mode)
-
-print(component.port_pairs)       # [(1, 2)]
-print(component.ports_by_number)  # {1: Port(...), 2: Port(...)}
-```
-
-### Creating a vessel
-
-```python
-from chemunited_core.components import VesselMode, VesselComponentData
-
-mode = VesselMode(
-    name="Flask1",
-    figure="FlaskFigure",
-    position=(1.0, 0.0),
-    angle=0,
-    capacity="250 ml",
-    top_access=3,
-    bottom_access=2,
+from chemunited_core.components import (
+    FlowSourceData,
+    FlowSourceMode,
+    PlugFlowComponentData,
+    PlugFlowMode,
+    VesselComponentData,
+    VesselMode,
 )
-vessel = VesselComponentData.from_mode(mode)
-print(vessel.capacity)  # 250 ml
+from chemunited_core.connections import EdgeData, EdgeMode
+
+source = FlowSourceData.from_mode(
+    FlowSourceMode(
+        name="FeedPump",
+        figure="PumpFigure",
+        position=(0.0, 0.0),
+        angle=0,
+        flow_rate="5 ml/min",
+    )
+)
+
+reactor = PlugFlowComponentData.from_mode(
+    PlugFlowMode(
+        name="ReactorTube",
+        figure="TubeFigure",
+        position=(2.0, 0.0),
+        angle=0,
+        length="500 mm",
+        diameter="2 mm",
+    )
+)
+
+receiver = VesselComponentData.from_mode(
+    VesselMode(
+        name="Receiver",
+        figure="FlaskFigure",
+        position=(4.0, 0.0),
+        angle=0,
+        capacity="250 ml",
+        top_access=3,
+        bottom_access=2,
+    )
+)
+
+edge_a = EdgeData.from_mode(
+    EdgeMode(
+        origin=source.name,
+        destination=reactor.name,
+        origin_port=1,
+        destination_port=1,
+        length="100 mm",
+        diameter="1.6 mm",
+    )
+)
+
+edge_b = EdgeData.from_mode(
+    EdgeMode(
+        origin=reactor.name,
+        destination=receiver.name,
+        origin_port=2,
+        destination_port=1,
+        length="150 mm",
+        diameter="1.6 mm",
+    )
+)
+
+components = [source, reactor, receiver]
+connections = [edge_a, edge_b]
 ```
 
-### Creating a plug-flow reactor
+Inspect the compiled topology through public runtime fields:
 
 ```python
-from chemunited_core.components import PlugFlowMode, PlugFlowComponentData
+for component in components:
+    print(component.name, sorted(component.ports_by_number))
+    print(component.port_pairs)
+    print(component.internal_inventory)
 
-mode = PlugFlowMode(
-    name="Reactor1",
-    figure="TubeFigure",
-    position=(2.0, 0.0),
-    angle=0,
-    length="500 mm",
-    diameter="2 mm",
-)
-reactor = PlugFlowComponentData.from_mode(mode)
-print(reactor.capacity)  # volume in m³
+for edge_key, internal_edge in reactor.internal_edges.items():
+    print(edge_key, internal_edge.length, internal_edge.diameter)
 ```
 
-### Creating a connection
+Apply updates through `update()` so derived state stays in sync:
 
 ```python
-from chemunited_core.connections import EdgeMode, EdgeData
-
-mode = EdgeMode(
-    origin="Pump A",
-    destination="Flask1",
-    origin_port=2,
-    destination_port=1,
-    length="150 mm",
-    diameter="1 mm",
-)
-edge = EdgeData.from_mode(mode)
-print(edge.name)      # "Pump A_2_Flask1_1"
-print(edge.capacity)  # cross-sectional volume in m³
+source.update(FlowSourceMode(flow_rate="8 ml/min"))
+reactor.update(PlugFlowMode(length="750 mm", diameter="1.0 mm"))
 ```
 
----
+That patch-style update behavior is especially useful when another package stores partial UI edits, protocol commands, or configuration diffs.
+
+## Ports, Internal Edges, and Inventory
+
+For downstream packages, the most important compiled objects are:
+
+- `Port`: the externally connectable point on a component. GUI or graph packages usually read `relative_position`, `category`, `access`, `closure`, and `boundary`.
+- `InternalEdge`: the directed edge inside a component. Simulation packages usually read `length`, `diameter`, `role`, and `resistance_override`.
+- `InventoryNode`: the lumped storage node for vessels and similar components.
+
+These objects live in `chemunited_core.components.internals` and are populated by each component's `internal_structure()` implementation.
+
+## Units and Quantities
+
+`chemunited-core` uses Pint-backed quantities through `ChemUnitQuantity`.
+
+- Mode fields accept strings such as `"5 ml/min"`, `"250 ml"`, `"1.2 bar"`, or `"500 mm"`.
+- Runtime helpers such as `flow_rate_si`, `setpoint_pa`, `length_value`, `diameter_value`, and `capacity_value` expose SI magnitudes where needed.
+- Shared unit conversions should use `chemunited_core.utils.ureg`.
+
+## Examples
+
+See [examples/build_valve_graph.py](examples/build_valve_graph.py) for a runnable example that builds a small hydraulic setup and inspects component ports, internal edges, and process connections.
+
+Run it from the repository root:
+
+```bash
+python examples/build_valve_graph.py
+```
+
+If `pyvis` is installed, the example also writes an HTML graph to `examples/output/valve_flow_graph.html`.
 
 ## Development
 
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov
-
-# Run a single test file
-pytest tests/test_from_mode.py
-```
-
-Pre-commit hooks (Ruff lint/import sorting, Black formatting, mypy, and general checks) are configured in `.pre-commit-config.yaml`:
+The current verified quality gate is:
 
 ```bash
-pip install pre-commit
-pre-commit install
-
-# Run manually on all files
 pre-commit run --all-files
 ```
 
----
+Useful local checks:
 
-## Dependencies
+```bash
+python -c "import sys; from pathlib import Path; sys.path.insert(0, str(Path('src').resolve())); import chemunited_core.components"
+python examples/build_valve_graph.py
+```
 
-| Package | Version | Purpose |
-|---|---|---|
-| `pydantic` | ≥ 2.0 | Input validation and schema definition |
-| `pint` | ≥ 0.23 | Physical unit handling |
-| `pydantic-pint` | ≥ 0.3 | Pydantic integration for Pint quantities |
-| `numpy` | ≥ 1.26 | Numerical operations |
-
----
+The `tests/` directory exists, but there are currently no checked-in test modules.
 
 ## License
 
-See [LICENSE](LICENSE) for details.
-
----
-
-## Author
-
-Samuel Vitor Saraiva — Max Planck Institute of Colloids and Interfaces
+See [LICENSE](LICENSE).
