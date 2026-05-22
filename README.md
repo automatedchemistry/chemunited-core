@@ -216,7 +216,7 @@ python -c "import sys; from pathlib import Path; sys.path.insert(0, str(Path('sr
 python examples/build_valve_graph.py
 ```
 
-The `tests/` directory exists, but there are currently no checked-in test modules.
+A minimal import smoke test lives in `tests/test_imports.py`.
 
 ## License
 

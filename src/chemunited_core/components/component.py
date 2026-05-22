@@ -12,6 +12,7 @@ Every concrete component subclasses both and implements internal_structure()
 to populate ports, internal edges, and the inventory node.
 sync_internal_state() is called when the user updates parameters via the GUI.
 """
+
 from dataclasses import dataclass, field
 from typing import ClassVar, Literal
 
@@ -33,6 +34,7 @@ class ComponentMode(BaseModel, populate_by_name=True):
     Serialised to project configuration files alongside ComponentData.
     Subclass this for each concrete component to declare its configurable fields.
     """
+
     name: str = Field(
         default="",
         title="Component Name",
@@ -75,7 +77,7 @@ class ComponentMode(BaseModel, populate_by_name=True):
         return value
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ComponentData(Element):
     """Runtime structural description of a component instance.
 
@@ -96,6 +98,7 @@ class ComponentData(Element):
         internal_edges:     Internal channels keyed by (origin, destination).
         internal_inventory: Lumped control volume; None for non-storage components.
     """
+
     name: str = ""
     figure: str = ""
     position: tuple[float, float] = (0, 0)
