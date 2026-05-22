@@ -302,8 +302,7 @@ def _port_title(component: ComponentData, port_number: int) -> str:
             f"access: {port.access.name.lower()}",
             f"closure: {port.closure.name.lower()}",
             (
-                "boundary: "
-                f"{port.boundary.kind.name.lower()}={port.boundary.value}"
+                "boundary: " f"{port.boundary.kind.name.lower()}={port.boundary.value}"
                 if port.boundary is not None
                 else "boundary: none"
             ),

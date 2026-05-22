@@ -39,6 +39,7 @@ class PortBoundaryCondition:
         kind:  Type of boundary condition (PRESSURE or FLOW).
         value: Imposed value — Pa for PRESSURE, m³/s for FLOW.
     """
+
     kind: BoundaryConditionKind = BoundaryConditionKind.NONE
     value: float = 0.0
 
@@ -60,6 +61,7 @@ class Port:
         closure:           Physical seal state set by the user (OPEN / CAPPED).
         boundary:          Explicit boundary condition; None means internal node.
     """
+
     number: int
     component: str
     category: ConnectionType = ConnectionType.HYDRAULIC
@@ -94,10 +96,11 @@ class InternalEdge:
         origin_port:         Source endpoint — port number or 'Inventory'.
         destination_port:    Target endpoint — port number or 'Inventory'.
         length:              Channel length in metres (used for resistance calc).
-        diameter:            Channel inner diameter in metres (used for resistance calc).
+        diameter:            Channel inner diameter in metres.
         role:                TRANSPORT (geometry matters) or JUNCTION (lossless).
         resistance_override: Fixed resistance in Pa·s/m³; None = compute from geometry.
     """
+
     origin_port: int = 1
     destination_port: int | str = 2
     length: float = 1e-3
@@ -136,5 +139,6 @@ class InventoryNode:
         liq_content: Initial state of the liquid phase inventory.
         gas_content: Initial state of the gas phase inventory.
     """
+
     liq_content: VolumeContentBase = field(default_factory=VolumeContentBase)
     gas_content: VolumeContentBase = field(default_factory=VolumeContentBase)
