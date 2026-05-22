@@ -13,8 +13,13 @@ to populate ports, internal edges, and the inventory node.
 sync_internal_state() is called when the user updates parameters via the GUI.
 """
 
+from networkx.generators import spectral_graph_forge
 from dataclasses import dataclass, field
 from typing import ClassVar, Literal
+
+import logging
+
+_log = logging.getLogger(__name__)
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -23,6 +28,7 @@ from chemunited_core.common.metadata import Element
 
 from .enums import ComponentType
 from .internals import InternalEdge, InventoryNode, Port
+from .command import CommandEffect
 
 EdgeKey = tuple[int, int | Literal["Inventory"]]
 
@@ -134,6 +140,56 @@ class ComponentData(Element):
         }
         self.internal_edges = {}
         self.internal_inventory = None
+
+    def receive_command(self, command: str, **kwargs) -> CommandEffect:
+        """Apply a runtime command to this component and return a graph sync hint.
+    
+        Non-electronic components log an error and return an empty effect —
+        they are passive utensils and have no actuatable parameters.
+    
+        Electronic subclasses **must** override this method to handle their own
+        command vocabulary.  The base electronic implementation raises
+        ``NotImplementedError`` as a reminder.
+    
+        The method is always called while the simulation step lock is held by the
+        server, so it is safe to mutate internal state without additional guards.
+        Call ``self.sync_internal_state()`` inside the override to propagate
+        changes that use shared-reference propagation (e.g. boundary conditions).
+    
+        Parameters
+        ----------
+        command:
+            Name of the command to execute (e.g. ``"set_flow_rate"``).
+            Must be one of the strings returned by ``available_commands()``.
+        **kwargs:
+            Command-specific parameters.  Physical quantities may be passed as
+            plain strings (``"5 ml/min"``) — ``ChemQuantityValidator`` handles
+            conversion internally when assigned to ``ChemUnitQuantity`` fields.
+    
+        Returns
+        -------
+        CommandEffect
+            Graph sync instructions for the simulation server.
+            Return an empty ``CommandEffect()`` when ``sync_internal_state()``
+            already propagated the change via shared references.
+    
+        Raises
+        ------
+        ValueError
+            If ``command`` is not in ``available_commands()``.
+        NotImplementedError
+            If the subclass is electronic but has not overridden this method.
+        """
+        if not self.is_electronic:
+            _log.error(
+                "Component '%s' (%s) is not electronic and does not accept commands. "
+                "Ignoring command '%s'.",
+                self.name,
+                type(self).__name__,
+                command,
+            )
+        return CommandEffect()
+            
 
 
 @dataclass
