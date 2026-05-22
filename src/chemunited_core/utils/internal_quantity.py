@@ -131,9 +131,9 @@ class ChemQuantityValidator(PydanticPintQuantity):
 
     def serialize(self, *args, **kwargs) -> dict | str | ChemUnitQuantity:
         v = super().serialize(*args, **kwargs)
-        if isinstance(v, Quantity):
-            return ChemUnitQuantity(v)
-        return v
+        if isinstance(v, (dict, str)):
+            return v
+        return ChemUnitQuantity(v)
 
 
 if __name__ == "__main__":
