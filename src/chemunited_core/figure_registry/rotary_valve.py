@@ -1,13 +1,16 @@
 from dataclasses import dataclass, field
 
-from pydantic import Field
-
 from chemunited.core.common.enums import GroupParameterCategory
+from chemunited.core.components import PutResult
 from chemunited.core.components.glossary.rotary_valve import (
     ValveComponentData,
     ValveMode,
     ValvePortLayout,
+    connection_from_rotor,
+    rotate_rotor,
+    rotor_from_connection,
 )
+from pydantic import Field
 
 THREE_PORT_TWO_POSITION_STATOR: ValvePortLayout = [(None, 1, 2, 3), (0,)]
 THREE_PORT_TWO_POSITION_ROTOR: ValvePortLayout = [(4, 4, None, None), (None,)]
@@ -116,7 +119,39 @@ def _rotor_field(layout: ValvePortLayout):
 
 
 @dataclass
-class ThreePortTwoPositionValveData(ValveComponentData):
+class RotaryValveData(ValveComponentData):
+    """Intermediate base for all rotary valves — adds position-command support."""
+
+    def put(self, command: str, **kwargs) -> PutResult:
+        if command == "position":
+            new_rotor, _ = rotor_from_connection(
+                stator_ports=self.stator_ports,
+                rotor_ports=self.rotor_ports,
+                connection=kwargs.get("connect", [1, 2]),
+            )
+            if not new_rotor:
+                raise ValueError(
+                    f"It is not possible to connect the ports "
+                    f"{kwargs.get('connect')} in "
+                    f"{type(self).__name__}."
+                )
+            return PutResult()
+        raise ValueError(f"Unknown command '{command}' for {type(self).__name__}.")
+
+    def apply(self, command: str, **kwargs) -> None:
+        if command == "position":
+            new_rotor, _ = rotor_from_connection(
+                stator_ports=self.stator_ports,
+                rotor_ports=self.rotor_ports,
+                connection=kwargs.get("connect", [1, 2]),
+            )
+            if new_rotor:
+                self.rotor_ports = new_rotor
+                self.sync_internal_state()
+
+
+@dataclass
+class ThreePortTwoPositionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(THREE_PORT_TWO_POSITION_STATOR)
     )
@@ -131,7 +166,7 @@ class ThreePortTwoPositionValveMode(ValveMode):
 
 
 @dataclass
-class ThreePortFourPositionValveData(ValveComponentData):
+class ThreePortFourPositionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(THREE_PORT_FOUR_POSITION_STATOR)
     )
@@ -146,7 +181,7 @@ class ThreePortFourPositionValveMode(ValveMode):
 
 
 @dataclass
-class FourPortFivePositionValveData(ValveComponentData):
+class FourPortFivePositionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(FOUR_PORT_FIVE_POSITION_STATOR)
     )
@@ -161,7 +196,7 @@ class FourPortFivePositionValveMode(ValveMode):
 
 
 @dataclass
-class SixPortTwoPositionValveData(ValveComponentData):
+class SixPortTwoPositionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(SIX_PORT_TWO_POSITION_STATOR)
     )
@@ -176,7 +211,7 @@ class SixPortTwoPositionValveMode(ValveMode):
 
 
 @dataclass
-class TwoPortDistributionValveData(ValveComponentData):
+class TwoPortDistributionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(TWO_PORT_DISTRIBUTION_STATOR)
     )
@@ -191,7 +226,7 @@ class TwoPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class FourPortDistributionValveData(ValveComponentData):
+class FourPortDistributionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(FOUR_PORT_DISTRIBUTION_STATOR)
     )
@@ -206,7 +241,7 @@ class FourPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class SixPortDistributionValveData(ValveComponentData):
+class SixPortDistributionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(SIX_PORT_DISTRIBUTION_STATOR)
     )
@@ -221,7 +256,7 @@ class SixPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class TwelvePortDistributionValveData(ValveComponentData):
+class TwelvePortDistributionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(TWELVE_PORT_DISTRIBUTION_STATOR)
     )
@@ -236,7 +271,7 @@ class TwelvePortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class SixteenPortDistributionValveData(ValveComponentData):
+class SixteenPortDistributionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(SIXTEEN_PORT_DISTRIBUTION_STATOR)
     )

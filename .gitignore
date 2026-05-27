@@ -204,3 +204,5 @@ examples/output/
 AGENTS.md
 CLAUDE.md
 .claude/
+
+.pre-commit-cache*

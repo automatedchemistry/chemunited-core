@@ -1,10 +1,6 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from typing_extensions import override
-
-from pydantic import Field
-
 from chemunited.core.common.enums import (
     ConnectionType,
     GroupParameterCategory,
@@ -19,6 +15,8 @@ from chemunited.core.components import (
 from chemunited.core.components.enums import ComponentType, InternalEdgeRole
 from chemunited.core.components.internals import InternalEdge, InventoryNode, Port
 from chemunited.core.compounds import VolumeContentBase
+from pydantic import Field
+from typing_extensions import override
 
 CELL_SIZE = 40
 ROW_HEADER_WIDTH = 12

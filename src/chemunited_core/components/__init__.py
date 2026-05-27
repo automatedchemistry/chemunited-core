@@ -1,3 +1,4 @@
+from .command import PutResult, ScheduledCommand
 from .component import ComponentData, ComponentMode, NeutralComponentData
 from .flow_source import FlowSourceData, FlowSourceMode
 from .junction import JunctionData, JunctionMode
@@ -25,4 +26,6 @@ __all__ = [
     "ValveMode",
     "VesselComponentData",
     "VesselMode",
+    "PutResult",
+    "ScheduledCommand",
 ]
