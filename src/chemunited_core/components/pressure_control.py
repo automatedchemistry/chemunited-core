@@ -20,6 +20,7 @@ from chemunited_core.utils.internal_quantity import (
     ChemUnitQuantity,
 )
 
+from .command import PutResult
 from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind
 from .internals import Port, PortBoundaryCondition
@@ -73,3 +74,13 @@ class PressureControlData(ComponentData):
         port = self.ports_by_number.get(1)
         port.boundary.kind = BoundaryConditionKind.PRESSURE
         port.boundary.value = self.setpoint_pa
+
+    def put(self, command: str, **kwargs) -> PutResult:
+        if command == "set_pressure":
+            return PutResult()
+        raise ValueError(f"Unknown command '{command}' for PressureControlData.")
+
+    def apply(self, command: str, **kwargs) -> None:
+        if command == "set_pressure":
+            self.setpoint = ChemUnitQuantity(kwargs["setpoint"])
+            self.sync_internal_state()

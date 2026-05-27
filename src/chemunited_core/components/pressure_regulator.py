@@ -23,6 +23,7 @@ from chemunited_core.utils.internal_quantity import (
     ChemUnitQuantity,
 )
 
+from .command import PutResult
 from .component import ComponentData, ComponentMode
 from .internals import InternalEdge, Port
 
@@ -67,3 +68,12 @@ class BackPressureRegulatorData(ComponentData):
             ).close()
         }
         self.internal_inventory = None
+
+    def put(self, command: str, **kwargs) -> PutResult:
+        if command == "set_pressure":
+            return PutResult()
+        raise ValueError(f"Unknown command '{command}' for BackPressureRegulatorData.")
+
+    def apply(self, command: str, **kwargs) -> None:
+        if command == "set_pressure":
+            self.setpoint = ChemUnitQuantity(kwargs["setpoint"])
