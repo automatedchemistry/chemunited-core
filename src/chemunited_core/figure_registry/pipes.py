@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import Annotated, ClassVar
 
-from chemunited.core.components import (
+from pydantic import Field
+
+from chemunited_core.components import (
     ComponentData,
     ComponentMode,
     PressureControlData,
@@ -9,12 +11,11 @@ from chemunited.core.components import (
     VesselComponentData,
     VesselMode,
 )
-from chemunited.core.components.enums import ComponentType
-from chemunited.core.utils.internal_quantity import (
+from chemunited_core.components.enums import ComponentType
+from chemunited_core.utils.internal_quantity import (
     ChemQuantityValidator,
     ChemUnitQuantity,
 )
-from pydantic import Field
 
 
 class SourceMode(PressureControlMode): ...

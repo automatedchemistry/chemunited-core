@@ -9,26 +9,33 @@ ComponentData  — Dataclass; holds the compiled structural state of one
                 and by chemunited-sim's DigitalTwinAdapter.
 
 Every concrete component subclasses both and implements internal_structure()
-to populate ports, internal edges, and the inventory node.
+to populate ports, internal edges, and inventory nodes.
 sync_internal_state() is called when the user updates parameters via the GUI.
 """
 
-import logging
 from dataclasses import dataclass, field
-from typing import ClassVar, Literal
-
-_log = logging.getLogger(__name__)
+from typing import ClassVar
 
 from pydantic import BaseModel, Field, field_validator
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.common.metadata import Element
 
 from .command import PutResult
 from .enums import ComponentType
-from .internals import InternalEdge, InventoryNode, Port
+from .internals import (
+    DEFAULT_INVENTORY_KEY,
+    InternalEdge,
+    InternalEndpoint,
+    InventoryKey,
+    InventoryNode,
+    Port,
+)
 
-EdgeKey = tuple[int, int | Literal["Inventory"]]
+EdgeKey = tuple[int, InternalEndpoint]
+
+PATTERN_DIMENSION = 50
 
 
 class ComponentMode(BaseModel, populate_by_name=True):
@@ -46,6 +53,7 @@ class ComponentMode(BaseModel, populate_by_name=True):
         json_schema_extra={
             "group": GroupParameterCategory.GENERAL.value,
             "editable": False,
+            "creation_editable": True,
         },
     )
     figure: str = Field(
@@ -73,6 +81,12 @@ class ComponentMode(BaseModel, populate_by_name=True):
         description="Component Position in the Scene",
         json_schema_extra={"group": GroupParameterCategory.GENERAL.value},
     )
+    mirror: bool = Field(
+        default=False,
+        title="Mirror Component",
+        description="Horizontal mirror of the component figure",
+        json_schema_extra={"group": GroupParameterCategory.GENERAL.value},
+    )
 
     @field_validator("name")
     def validate_name(cls, value: str) -> str:
@@ -81,7 +95,7 @@ class ComponentMode(BaseModel, populate_by_name=True):
         return value
 
 
-@dataclass(kw_only=True)
+@dataclass
 class ComponentData(Element):
     """Runtime structural description of a component instance.
 
@@ -100,20 +114,23 @@ class ComponentData(Element):
         port_pairs:         Valid external connection pairs for topology rules.
         ports_by_number:    All ports indexed by port number.
         internal_edges:     Internal channels keyed by (origin, destination).
-        internal_inventory: Lumped control volume; None for non-storage components.
+        internal_inventories: Lumped control volumes keyed by stable inventory IDs.
     """
 
     name: str = ""
     figure: str = ""
     position: tuple[float, float] = (0, 0)
     angle: int = 0
+    mirror: bool = False
     COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.ELECTRONIC
     port_pairs: list[tuple[int, ...]] = field(default_factory=list, init=False)
     ports_by_number: dict[int, Port] = field(default_factory=dict, init=False)
     internal_edges: dict[EdgeKey, InternalEdge] = field(
         default_factory=dict, init=False
     )
-    internal_inventory: InventoryNode | None = field(default=None, init=False)
+    internal_inventories: dict[InventoryKey, InventoryNode] = field(
+        default_factory=dict, init=False
+    )
 
     """ Properties """
 
@@ -125,6 +142,20 @@ class ComponentData(Element):
     def is_electronic(self) -> bool:
         return self.component_type == ComponentType.ELECTRONIC
 
+    @property
+    def internal_inventory(self) -> InventoryNode | None:
+        """Compatibility alias returning the first internal inventory."""
+
+        return next(iter(self.internal_inventories.values()), None)
+
+    @internal_inventory.setter
+    def internal_inventory(self, inventory: InventoryNode | None) -> None:
+        """Compatibility setter for old singleton-inventory code."""
+
+        self.internal_inventories = (
+            {} if inventory is None else {DEFAULT_INVENTORY_KEY: inventory}
+        )
+
     """ Initialization """
 
     def __post_init__(self):
@@ -133,35 +164,44 @@ class ComponentData(Element):
     def internal_structure(self):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
-            1: Port(number=1, component=self.name, relative_position=(-1, 0)),
-            2: Port(number=2, component=self.name, relative_position=(1, 0)),
+            1: Port(
+                number=1,
+                component=self.name,
+                relative_position=(-PATTERN_DIMENSION / 2, 0),
+            ),
+            2: Port(
+                number=2,
+                component=self.name,
+                relative_position=(PATTERN_DIMENSION / 2, 0),
+            ),
         }
         self.internal_edges = {}
-        self.internal_inventory = None
+        self.internal_inventories = {}
 
-    def put(self, command: str, **kwargs) -> PutResult:
-        """Apply a command; return graph effect + scheduled follow-up events."""
-        if not self.is_electronic:
-            _log.error(
-                "Component '%s' is not electronic. Ignoring '%s'.", self.name, command
-            )
-            return PutResult()
-        raise NotImplementedError(f"{type(self).__name__} must implement put().")
+    """ Commands - status change """
 
-    def get(self, command: str, **kwargs) -> dict | None:
-        """Read current state. Returns None in simulation context."""
-        return None
+    def put(self, command: str, **kwargs): ...
 
-    def apply(self, command: str, **kwargs) -> None:
-        """Mutate internal state. Called by the sim thread when firing a timeline frame."""
-        if not self.is_electronic:
-            _log.error(
-                "Component '%s' is not electronic. Ignoring '%s'.", self.name, command
-            )
-            return
-        raise NotImplementedError(f"{type(self).__name__} must implement apply().")
+    def apply(self, command: str, **kwargs) -> PutResult:
+        """Apply a command, mutating runtime state for the live simulation.
+
+        Unlike put() (pure computation), apply() mutates this ComponentData in
+        place and MUST call sync_internal_state() whenever it changes a
+        parameter. The returned PutResult carries any derived follow-up events
+        (e.g. a pump auto-stop scheduled at volume / rate seconds from now) for
+        the sim Worker to schedule.
+
+        The base implementation is a no-op returning an empty PutResult, which
+        is correct for passive or uncontrolled components (junctions, tubing,
+        vessels, sensors, ...). Concrete controllable components override this.
+        """
+        return PutResult()
+
+    def get(self, command: str, **kwargs): ...
 
 
 @dataclass
 class NeutralComponentData(ComponentData):
-    def __post_init__(self): ...
+    @override
+    def internal_structure(self):
+        pass

@@ -13,9 +13,10 @@ Sim: setpoint_pa is read by the adapter each time step to evaluate the
 """
 
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from pydantic import Field
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.utils.internal_quantity import (
@@ -23,8 +24,8 @@ from chemunited_core.utils.internal_quantity import (
     ChemUnitQuantity,
 )
 
-from .command import PutResult
 from .component import ComponentData, ComponentMode
+from .enums import ComponentType
 from .internals import InternalEdge, Port
 
 
@@ -48,13 +49,15 @@ class BackPressureRegulatorData(ComponentData):
     time step based on the upstream pressure vs. setpoint comparison.
     """
 
-    setpoint: ChemUnitQuantity
+    COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.UTENSIL
+    setpoint: ChemUnitQuantity = ChemUnitQuantity("1 bar")
 
     @property
     def setpoint_pa(self) -> float:
         """Setpoint in Pascals for the hydraulic solver."""
         return self.setpoint.to_base_units().magnitude
 
+    @override
     def internal_structure(self):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
@@ -67,13 +70,4 @@ class BackPressureRegulatorData(ComponentData):
                 destination_port=2,
             ).close()
         }
-        self.internal_inventory = None
-
-    def put(self, command: str, **kwargs) -> PutResult:
-        if command == "set_pressure":
-            return PutResult()
-        raise ValueError(f"Unknown command '{command}' for BackPressureRegulatorData.")
-
-    def apply(self, command: str, **kwargs) -> None:
-        if command == "set_pressure":
-            self.setpoint = ChemUnitQuantity(kwargs["setpoint"])
+        self.internal_inventories = {}

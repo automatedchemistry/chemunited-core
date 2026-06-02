@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Annotated
 
 from pydantic import Field
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.utils.internal_quantity import (
@@ -50,12 +51,13 @@ class FlowSourceData(ComponentData):
     user changes flow_rate in the GUI or via a protocol command.
     """
 
-    flow_rate: ChemUnitQuantity
+    flow_rate: ChemUnitQuantity = ChemUnitQuantity("0 ml/min")
 
     @property
     def flow_rate_si(self) -> float:
         return self.flow_rate.to_base_units().magnitude  # m³/s
 
+    @override
     def internal_structure(self):
         self.port_pairs = [(1,)]
         self.ports_by_number = {
@@ -68,5 +70,6 @@ class FlowSourceData(ComponentData):
             )
         }
 
+    @override
     def sync_internal_state(self):
         self.ports_by_number[1].boundary.value = self.flow_rate_si

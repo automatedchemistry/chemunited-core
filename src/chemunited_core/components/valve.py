@@ -19,7 +19,9 @@ from typing import TypeAlias
 
 import numpy as np
 from pydantic import Field
+from typing_extensions import override
 
+from chemunited_core.common.constant import PATTERN_DIMENSION
 from chemunited_core.common.enums import GroupParameterCategory
 
 from .component import ComponentData, ComponentMode
@@ -104,8 +106,12 @@ def possibles_connections_pairs(
     return sorted(set(points))
 
 
-def _port_numbers_from_stator(stator_ports: ValvePortLayout) -> list[int]:
+def _port_numbers_from_stator(
+    stator_ports: ValvePortLayout, rotor_ports: ValvePortLayout
+) -> list[int]:
     numbers = {number for row in stator_ports for number in row if number is not None}
+    if 0 in numbers and rotor_ports[1][0] is None:
+        numbers.remove(0)
     return sorted(numbers)
 
 
@@ -122,6 +128,7 @@ class ValveMode(ComponentMode):
         json_schema_extra={
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
+            "creation_editable": True,
         },
     )
     rotor_ports: ValvePortLayout = Field(
@@ -131,6 +138,7 @@ class ValveMode(ComponentMode):
         json_schema_extra={
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
+            "creation_editable": True,
         },
     )
 
@@ -153,8 +161,9 @@ class ValveComponentData(ComponentData):
     rotor_ports: ValvePortLayout = field(
         default_factory=lambda: _copy_port_layout(DEFAULT_ROTOR_PORTS)
     )
-    internal_radius = 1
+    internal_radius = PATTERN_DIMENSION
 
+    @override
     def internal_structure(self):
         connections = possibles_connections_pairs(
             stator_ports=self.stator_ports,
@@ -164,7 +173,7 @@ class ValveComponentData(ComponentData):
         self.port_pairs = valve_port_pairs
         self.ports_by_number = {
             number: Port(number=number, component=self.name)
-            for number in _port_numbers_from_stator(self.stator_ports)
+            for number in _port_numbers_from_stator(self.stator_ports, self.rotor_ports)
         }
         self.internal_edges = {
             pair: InternalEdge(
@@ -193,6 +202,7 @@ class ValveComponentData(ComponentData):
                     self.internal_radius * np.sin(phi),
                 )
 
+    @override
     def sync_internal_state(self):
         for edge in self.internal_edges.values():
             edge.close()

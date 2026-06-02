@@ -206,3 +206,4 @@ CLAUDE.md
 .claude/
 
 .pre-commit-cache*
+pytest-cache*

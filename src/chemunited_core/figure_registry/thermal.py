@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 
-from chemunited.core.common.enums import ConnectionType
-from chemunited.core.components import ComponentMode, NeutralComponentData
-from chemunited.core.components.internals import Port
 from typing_extensions import override
+
+from chemunited_core.common.enums import ConnectionType
+from chemunited_core.components import ComponentMode, NeutralComponentData
+from chemunited_core.components.internals import Port
 
 
 class TemperatureControlMode(ComponentMode): ...

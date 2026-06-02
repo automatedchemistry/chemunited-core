@@ -15,14 +15,16 @@ Sim: all JUNCTION edges are always active — no switching logic required.
 """
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 import numpy as np
 from pydantic import Field
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 
 from .component import ComponentData, ComponentMode
-from .enums import InternalEdgeRole
+from .enums import ComponentType, InternalEdgeRole
 from .internals import InternalEdge, Port
 
 
@@ -35,6 +37,7 @@ class JunctionMode(ComponentMode):
         json_schema_extra={
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
+            "creation_editable": True,
         },
     )
 
@@ -48,14 +51,18 @@ class JunctionData(ComponentData):
     explicit boundary condition — its pressure is solved by the network.
     """
 
-    number_ports: int
-    internal_radius: float = 1
+    COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.UTENSIL
+    number_ports: int = 3
+    internal_radius: float = 30
 
+    @override
     def internal_structure(self):
         self.port_pairs = [(i + 1, 0) for i in range(self.number_ports)]
-        self.ports_by_number = {0: Port(number=0, component=self.name)}
+        self.ports_by_number = {
+            0: Port(number=0, component=self.name, show_in_graph=False)
+        }
         self.internal_edges = {}
-        self.internal_inventory = None
+        self.internal_inventories = {}
 
         angles = np.arange(-np.pi / 2, 3 * np.pi / 2, 2 * np.pi / self.number_ports)
         for i in range(self.number_ports):

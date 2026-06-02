@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Annotated
 
 from pydantic import Field
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.utils.internal_quantity import (
@@ -20,7 +21,6 @@ from chemunited_core.utils.internal_quantity import (
     ChemUnitQuantity,
 )
 
-from .command import PutResult
 from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind
 from .internals import Port, PortBoundaryCondition
@@ -50,12 +50,13 @@ class PressureControlData(ComponentData):
     user changes setpoint in the GUI.
     """
 
-    setpoint: ChemUnitQuantity
+    setpoint: ChemUnitQuantity = ChemUnitQuantity("1 bar")
 
     @property
     def setpoint_pa(self) -> float:
         return self.setpoint.to_base_units().magnitude
 
+    @override
     def internal_structure(self):
         self.port_pairs = [(1,)]
         self.ports_by_number = {
@@ -68,19 +69,10 @@ class PressureControlData(ComponentData):
             )
         }
         self.internal_edges = {}
-        self.internal_inventory = None
+        self.internal_inventories = {}
 
+    @override
     def sync_internal_state(self):
         port = self.ports_by_number.get(1)
         port.boundary.kind = BoundaryConditionKind.PRESSURE
         port.boundary.value = self.setpoint_pa
-
-    def put(self, command: str, **kwargs) -> PutResult:
-        if command == "set_pressure":
-            return PutResult()
-        raise ValueError(f"Unknown command '{command}' for PressureControlData.")
-
-    def apply(self, command: str, **kwargs) -> None:
-        if command == "set_pressure":
-            self.setpoint = ChemUnitQuantity(kwargs["setpoint"])
-            self.sync_internal_state()

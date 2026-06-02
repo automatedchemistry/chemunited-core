@@ -1,22 +1,23 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from chemunited.core.common.enums import (
+from pydantic import Field
+from typing_extensions import override
+
+from chemunited_core.common.enums import (
     ConnectionType,
     GroupParameterCategory,
     PhaseKind,
 )
-from chemunited.core.components import (
+from chemunited_core.components import (
     PlugFlowComponentData,
     PlugFlowMode,
     VesselComponentData,
     VesselMode,
 )
-from chemunited.core.components.enums import ComponentType, InternalEdgeRole
-from chemunited.core.components.internals import InternalEdge, InventoryNode, Port
-from chemunited.core.compounds import VolumeContentBase
-from pydantic import Field
-from typing_extensions import override
+from chemunited_core.components.enums import ComponentType, InternalEdgeRole
+from chemunited_core.components.internals import InternalEdge, InventoryNode, Port
+from chemunited_core.compounds import VolumeContentBase
 
 CELL_SIZE = 40
 ROW_HEADER_WIDTH = 12

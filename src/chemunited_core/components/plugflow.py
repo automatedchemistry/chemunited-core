@@ -11,10 +11,11 @@ Sim: InternalEdge.length and diameter are the primary inputs to the
 """
 
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 import numpy as np
 from pydantic import Field
+from typing_extensions import override
 
 from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.utils.internal_quantity import (
@@ -23,6 +24,7 @@ from chemunited_core.utils.internal_quantity import (
 )
 
 from .component import ComponentData, ComponentMode
+from .enums import ComponentType
 from .internals import InternalEdge, Port
 
 
@@ -59,6 +61,7 @@ class PlugFlowComponentData(ComponentData):
     sync_internal_state() when the user changes geometry in the GUI.
     """
 
+    COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.UTENSIL
     length: ChemUnitQuantity = ChemUnitQuantity("100 mm")
     diameter: ChemUnitQuantity = ChemUnitQuantity("1 mm")
 
@@ -74,6 +77,7 @@ class PlugFlowComponentData(ComponentData):
     def diameter_value(self) -> float:
         return self.diameter.to_base_units().magnitude
 
+    @override
     def internal_structure(self):
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
@@ -89,6 +93,7 @@ class PlugFlowComponentData(ComponentData):
             )
         }
 
+    @override
     def sync_internal_state(self):
         edge = self.internal_edges.get((1, 2))
         edge.length = self.length_value

@@ -1,12 +1,9 @@
-from chemunited.core.components import (
+from chemunited_core.components import (
     BackPressureRegulatorData,
     BackPressureRegulatorMode,
     ComponentData,
     ComponentMode,
-    FlowSourceData,
     FlowSourceMode,
-    Gantry3DData,
-    Gantry3DMode,
     JunctionData,
     JunctionMode,
     NeutralComponentData,
@@ -17,7 +14,11 @@ from chemunited.core.components import (
     VesselComponentData,
     VesselMode,
 )
-from chemunited.core.figure_registry.pipes import (
+from chemunited_core.figure_registry.assemble import (
+    Gantry3DData,
+    Gantry3DMode,
+)
+from chemunited_core.figure_registry.pipes import (
     SeparatorData,
     SeparatorMode,
     SinkData,
@@ -25,10 +26,10 @@ from chemunited.core.figure_registry.pipes import (
     SourceData,
     SourceMode,
 )
-from chemunited.core.figure_registry.pumps import (
+from chemunited_core.figure_registry.pumps import (
     SyringePumpData,
 )
-from chemunited.core.figure_registry.rotary_valve import (
+from chemunited_core.figure_registry.rotary_valve import (
     FourPortDistributionValveData,
     FourPortDistributionValveMode,
     FourPortFivePositionValveData,
@@ -48,22 +49,22 @@ from chemunited.core.figure_registry.rotary_valve import (
     TwoPortDistributionValveData,
     TwoPortDistributionValveMode,
 )
-from chemunited.core.figure_registry.solenoid_valve import (
+from chemunited_core.figure_registry.solenoid_valve import (
     SolenoidValve2WayData,
     SolenoidValveData,
     SolenoidValveMode,
 )
-from chemunited.core.figure_registry.technical import (
+from chemunited_core.figure_registry.technical import (
     MultiChannelData,
     MultiChannelMode,
 )
-from chemunited.core.figure_registry.thermal import (
+from chemunited_core.figure_registry.thermal import (
     PeltierCoolerTemperatureControlData,
     PeltierCoolerTemperatureControlMode,
     TemperatureControlData,
     TemperatureControlMode,
 )
-from chemunited.core.figure_registry.vessels import (
+from chemunited_core.figure_registry.vessels import (
     FlowReactorData,
     FlowReactorMode,
     GlassBottleData,

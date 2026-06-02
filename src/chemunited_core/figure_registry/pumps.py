@@ -19,7 +19,7 @@ class SyringePumpData(FlowSourceData):
 
         raise ValueError(f"Unknown command '{command}' for SyringePumpData.")
 
-    def apply(self, command: str, **kwargs) -> None:
+    def apply(self, command: str, **kwargs) -> PutResult:
         if command in ["infuse", "withdraw"]:
             rate_str = kwargs["rate"]
             self.flow_rate = (
@@ -29,6 +29,17 @@ class SyringePumpData(FlowSourceData):
             )
             self.sync_internal_state()
 
-        elif command == "stop":
+            scheduled: list[ScheduledCommand] = []
+            if "volume" in kwargs:
+                flow_rate_si = ChemUnitQuantity(rate_str).to_base_units().magnitude
+                volume_si = ChemUnitQuantity(kwargs["volume"]).to_base_units().magnitude
+                dt = volume_si / flow_rate_si
+                scheduled.append(ScheduledCommand(dt=dt, command="stop"))
+            return PutResult(scheduled=scheduled)
+
+        if command == "stop":
             self.flow_rate = ChemUnitQuantity("0 ml/min")
             self.sync_internal_state()
+            return PutResult()
+
+        return PutResult()

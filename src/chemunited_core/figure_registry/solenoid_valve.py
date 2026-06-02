@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 
-from chemunited.core.common.enums import GroupParameterCategory
-from chemunited.core.components import ComponentMode, PutResult, ValveComponentData
-from chemunited.core.components.glossary.rotary_valve import ValvePortLayout
 from pydantic import Field
 from typing_extensions import override
+
+from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.components import ComponentMode, PutResult, ValveComponentData
+from chemunited_core.components.valve import ValvePortLayout
 
 SOLENOID_VALVE_STATOR: ValvePortLayout = [(None, 1, None, 2), (None,)]
 SOLENOID_VALVE_ROTOR: ValvePortLayout = [(3, None, 3, None), (None,)]
@@ -63,13 +64,14 @@ class SolenoidValveData(ValveComponentData):
             return PutResult()
         raise ValueError(f"Unknown command '{command}' for {type(self).__name__}.")
 
-    def apply(self, command: str, **kwargs) -> None:
+    def apply(self, command: str, **kwargs) -> PutResult:
         if command == "open":
             self.opened = True
             self.sync_internal_state()
         elif command == "close":
             self.opened = False
             self.sync_internal_state()
+        return PutResult()
 
     @override
     def internal_structure(self):
@@ -102,13 +104,14 @@ class SolenoidValve2WayData(ValveComponentData):
             return PutResult()
         raise ValueError(f"Unknown command '{command}' for {type(self).__name__}.")
 
-    def apply(self, command: str, **kwargs) -> None:
+    def apply(self, command: str, **kwargs) -> PutResult:
         if command == "open":
             self.opened = True
             self.sync_internal_state()
         elif command == "close":
             self.opened = False
             self.sync_internal_state()
+        return PutResult()
 
     @override
     def internal_structure(self):

@@ -1,16 +1,16 @@
 from dataclasses import dataclass, field
 
-from chemunited.core.common.enums import GroupParameterCategory
-from chemunited.core.components import PutResult
-from chemunited.core.components.glossary.rotary_valve import (
+from pydantic import Field
+
+from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.components import PutResult
+from chemunited_core.components.valve import (
     ValveComponentData,
     ValveMode,
     ValvePortLayout,
     connection_from_rotor,
     rotate_rotor,
-    rotor_from_connection,
 )
-from pydantic import Field
 
 THREE_PORT_TWO_POSITION_STATOR: ValvePortLayout = [(None, 1, 2, 3), (0,)]
 THREE_PORT_TWO_POSITION_ROTOR: ValvePortLayout = [(4, 4, None, None), (None,)]
@@ -118,6 +118,27 @@ def _rotor_field(layout: ValvePortLayout):
     )
 
 
+def rotor_from_connection(
+    stator_ports: ValvePortLayout,
+    rotor_ports: ValvePortLayout,
+    connection: tuple[int, int] | list[int],
+) -> tuple[ValvePortLayout, list[tuple[int, int]]]:
+    requested = tuple(connection)
+    requested_reverse = requested[::-1]
+    rotor_candidate = _copy_port_layout(rotor_ports)
+
+    for _ in range(len(rotor_ports[0])):
+        _, active_connections = connection_from_rotor(
+            stator_ports=stator_ports,
+            rotor_ports=rotor_candidate,
+        )
+        if requested in active_connections or requested_reverse in active_connections:
+            return rotor_candidate, active_connections
+        rotor_candidate = rotate_rotor(rotor_ports=rotor_candidate)
+
+    return [], []
+
+
 @dataclass
 class RotaryValveData(ValveComponentData):
     """Intermediate base for all rotary valves — adds position-command support."""
@@ -138,7 +159,7 @@ class RotaryValveData(ValveComponentData):
             return PutResult()
         raise ValueError(f"Unknown command '{command}' for {type(self).__name__}.")
 
-    def apply(self, command: str, **kwargs) -> None:
+    def apply(self, command: str, **kwargs) -> PutResult:
         if command == "position":
             new_rotor, _ = rotor_from_connection(
                 stator_ports=self.stator_ports,
@@ -148,6 +169,7 @@ class RotaryValveData(ValveComponentData):
             if new_rotor:
                 self.rotor_ports = new_rotor
                 self.sync_internal_state()
+        return PutResult()
 
 
 @dataclass

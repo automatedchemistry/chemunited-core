@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 
-from chemunited.core.common.enums import ConnectionType, GroupParameterCategory
-from chemunited.core.components import ComponentMode, NeutralComponentData
-from chemunited.core.components.internals import Port
 from pydantic import Field
 from typing_extensions import override
+
+from chemunited_core.common.enums import ConnectionType, GroupParameterCategory
+from chemunited_core.components import ComponentMode, NeutralComponentData
+from chemunited_core.components.internals import Port
 
 
 class MultiChannelMode(ComponentMode):
