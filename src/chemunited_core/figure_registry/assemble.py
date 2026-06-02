@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing_extensions import override
 
 from pydantic import Field, field_validator
+from typing_extensions import override
 
 from chemunited_core.common.constant import PATTERN_DIMENSION
 from chemunited_core.common.enums import ConnectionType, GroupParameterCategory
@@ -41,7 +41,10 @@ class Gantry3DMode(ComponentMode):
         default=40,
         gt=0,
         title="Movement connections numbers",
-        description="The number of movement connections in the gantry that need to be connected to the others components.",
+        description=(
+            "The number of movement connections in the gantry that "
+            "need to be connected to the others components."
+        ),
         json_schema_extra={
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
