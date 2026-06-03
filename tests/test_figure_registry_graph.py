@@ -115,3 +115,25 @@ def test_solenoid_valve_2_way_common_port_is_hub() -> None:
     assert component.ports_by_number[1].is_hub is False
     assert component.ports_by_number[2].is_hub is False
     assert set(component.internal_edges) == {(0, 1), (0, 2)}
+
+
+def test_distribution_rotary_valves_common_port_is_hub() -> None:
+    distribution_valves = [
+        "TwoPortDistributionValve",
+        "FourPortDistributionValve",
+        "SixPortDistributionValve",
+        "TwelvePortDistributionValve",
+        "SixteenPortDistributionValve",
+    ]
+
+    for figure in distribution_valves:
+        data_class, mode_class = COMPONENTS[figure]
+        mode = mode_class(name=figure)
+        component = data_class.from_mode(mode)
+
+        assert not hasattr(mode, "ports_by_number")
+        assert component.ports_by_number[0].is_hub is True
+        assert all(
+            port.is_hub is (port_number == 0)
+            for port_number, port in component.ports_by_number.items()
+        )

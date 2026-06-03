@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import ClassVar
 
 from pydantic import Field
 
@@ -174,6 +175,11 @@ class RotaryValveData(ValveComponentData):
 
 
 @dataclass
+class DistributionRotaryValveData(RotaryValveData):
+    hub_ports: ClassVar[tuple[int, ...]] = (0,)
+
+
+@dataclass
 class ThreePortTwoPositionValveData(RotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(THREE_PORT_TWO_POSITION_STATOR)
@@ -233,8 +239,10 @@ class SixPortTwoPositionValveMode(ValveMode):
     rotor_ports: ValvePortLayout = _rotor_field(SIX_PORT_TWO_POSITION_ROTOR)
 
 
+# --- Distribution valves
+
 @dataclass
-class TwoPortDistributionValveData(RotaryValveData):
+class TwoPortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(TWO_PORT_DISTRIBUTION_STATOR)
     )
@@ -249,7 +257,7 @@ class TwoPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class FourPortDistributionValveData(RotaryValveData):
+class FourPortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(FOUR_PORT_DISTRIBUTION_STATOR)
     )
@@ -264,7 +272,7 @@ class FourPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class SixPortDistributionValveData(RotaryValveData):
+class SixPortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(SIX_PORT_DISTRIBUTION_STATOR)
     )
@@ -279,7 +287,7 @@ class SixPortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class TwelvePortDistributionValveData(RotaryValveData):
+class TwelvePortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(TWELVE_PORT_DISTRIBUTION_STATOR)
     )
@@ -294,7 +302,7 @@ class TwelvePortDistributionValveMode(ValveMode):
 
 
 @dataclass
-class SixteenPortDistributionValveData(RotaryValveData):
+class SixteenPortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
         default_factory=_layout_factory(SIXTEEN_PORT_DISTRIBUTION_STATOR)
     )
