@@ -104,3 +104,14 @@ def test_figure_registry_components_build_graph() -> None:
             destination.ports_by_number[connection.destination_port].category
             == connection.classification
         )
+
+
+def test_solenoid_valve_2_way_common_port_is_hub() -> None:
+    data_class, mode_class = COMPONENTS["SolenoidValve2Way"]
+    component = data_class.from_mode(mode_class(name="divertvalve"))
+
+    assert sorted(component.ports_by_number) == [0, 1, 2]
+    assert component.ports_by_number[0].is_hub is True
+    assert component.ports_by_number[1].is_hub is False
+    assert component.ports_by_number[2].is_hub is False
+    assert set(component.internal_edges) == {(0, 1), (0, 2)}

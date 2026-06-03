@@ -15,7 +15,7 @@ Sim: sync_internal_state() re-derives active connections from the current
 
 from copy import copy
 from dataclasses import dataclass, field
-from typing import TypeAlias
+from typing import ClassVar, TypeAlias
 
 import numpy as np
 from pydantic import Field
@@ -148,6 +148,7 @@ class ValveComponentData(ComponentData):
         default_factory=lambda: _copy_port_layout(DEFAULT_ROTOR_PORTS)
     )
     internal_radius = PATTERN_DIMENSION
+    hub_ports: ClassVar[tuple[int, ...]] = ()
 
     @override
     def internal_structure(self):
@@ -158,7 +159,11 @@ class ValveComponentData(ComponentData):
         valve_port_pairs: list[tuple[int, ...]] = [pair for pair in connections]
         self.port_pairs = valve_port_pairs
         self.ports_by_number = {
-            number: Port(number=number, component=self.name)
+            number: Port(
+                number=number,
+                component=self.name,
+                is_hub=number in self.hub_ports,
+            )
             for number in _port_numbers_from_stator(self.stator_ports, self.rotor_ports)
         }
         self.internal_edges = {

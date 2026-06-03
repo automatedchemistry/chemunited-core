@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import ClassVar
 
 from pydantic import Field
 from typing_extensions import override
@@ -121,6 +122,7 @@ class SolenoidValve2WayData(ValveComponentData):
     )
     normally_open: bool = True
     opened: bool = True
+    hub_ports: ClassVar[tuple[int, ...]] = (0,)
 
     def put(self, command: str, **kwargs) -> PutResult:
         if command in ["open", "close"]:

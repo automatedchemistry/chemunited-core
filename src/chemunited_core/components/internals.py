@@ -73,6 +73,7 @@ class Port:
     access: PortAccess = PortAccess.TOP
     closure: PortClosure = PortClosure.OPEN
     boundary: PortBoundaryCondition | None = None
+    is_hub: bool = False
     show_in_graph: bool = True
 
     @property
