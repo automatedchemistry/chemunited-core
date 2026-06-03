@@ -48,7 +48,7 @@ class VesselMode(ComponentMode):
         },
     )
     top_access: int = Field(
-        default=3,
+        default=1,
         ge=1,
         title="Access at the top",
         description="Access connections at the top of the flask.",
@@ -60,7 +60,7 @@ class VesselMode(ComponentMode):
         },
     )
     bottom_access: int = Field(
-        default=2,
+        default=1,
         ge=1,
         title="Access at the bottom",
         description="Access connections at the bottom of the flask.",
@@ -72,7 +72,7 @@ class VesselMode(ComponentMode):
         },
     )
     heat_exchange: bool = Field(
-        default=True,
+        default=False,
         title="Heat Exchange",
         description="Whether the component allows heat exchange.",
         json_schema_extra={
@@ -83,7 +83,7 @@ class VesselMode(ComponentMode):
         },
     )
     pressure_access: bool = Field(
-        default=True,
+        default=False,
         title="Pressure Access",
         description="Whether the component allows air pressure access.",
         json_schema_extra={

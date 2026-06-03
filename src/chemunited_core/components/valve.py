@@ -126,6 +126,7 @@ class ValveMode(ComponentMode):
         title="Valve stator ports",
         description="External stator port layout for the valve body.",
         json_schema_extra={
+            "visible": False,
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
             "creation_editable": True,
@@ -136,6 +137,7 @@ class ValveMode(ComponentMode):
         title="Valve rotor ports",
         description="Rotor channel layout used to derive possible connections.",
         json_schema_extra={
+            "visible": False,
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
             "creation_editable": True,
