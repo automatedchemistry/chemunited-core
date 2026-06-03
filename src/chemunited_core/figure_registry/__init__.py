@@ -51,6 +51,7 @@ from chemunited_core.figure_registry.rotary_valve import (
 )
 from chemunited_core.figure_registry.solenoid_valve import (
     SolenoidValve2WayData,
+    Solenoid2WayValveMode,
     SolenoidValveData,
     SolenoidValveMode,
 )
@@ -156,7 +157,7 @@ COMPONENTS: dict[str, tuple[type[ComponentData], type[ComponentMode]]] = {
     ),
     # valve - solenoid
     "SolenoidValve": (SolenoidValveData, SolenoidValveMode),
-    "SolenoidValve2Way": (SolenoidValve2WayData, SolenoidValveMode),
+    "SolenoidValve2Way": (SolenoidValve2WayData, Solenoid2WayValveMode),
     # vessels
     "CustomFlask": (VesselComponentData, VesselMode),
     "FlowReactor": (FlowReactorData, FlowReactorMode),

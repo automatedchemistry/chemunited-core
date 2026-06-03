@@ -122,26 +122,10 @@ class ValveMode(ComponentMode):
     """
 
     stator_ports: ValvePortLayout = Field(
-        default_factory=lambda: _copy_port_layout(DEFAULT_STATOR_PORTS),
-        title="Valve stator ports",
-        description="External stator port layout for the valve body.",
-        json_schema_extra={
-            "visible": False,
-            "group": GroupParameterCategory.PROPERTY.value,
-            "editable": False,
-            "creation_editable": True,
-        },
+        default_factory=lambda: _copy_port_layout(DEFAULT_STATOR_PORTS)
     )
     rotor_ports: ValvePortLayout = Field(
-        default_factory=lambda: _copy_port_layout(DEFAULT_ROTOR_PORTS),
-        title="Valve rotor ports",
-        description="Rotor channel layout used to derive possible connections.",
-        json_schema_extra={
-            "visible": False,
-            "group": GroupParameterCategory.PROPERTY.value,
-            "editable": False,
-            "creation_editable": True,
-        },
+        default_factory=lambda: _copy_port_layout(DEFAULT_ROTOR_PORTS)
     )
 
 

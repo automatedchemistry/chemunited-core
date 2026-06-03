@@ -10,11 +10,11 @@ class ChemUnitQuantity(Quantity):
 
     @classmethod
     def parse(cls, v):
-        if isinstance(v, Quantity):
+        if isinstance(v, Quantity):  # type: ignore[arg-type]
             return cls(v.magnitude, v.units)
         if isinstance(v, str):
             q = ureg(v)
-            return cls(q.magnitude, q.units)
+            return cls(q.magnitude, q.units)  # type: ignore[return-value]
         if isinstance(v, (int, float)):
             raise ValueError("Numeric values require a unit")
         raise ValueError(f"Unsupported type: {type(v)}")
@@ -30,12 +30,12 @@ class ChemUnitQuantity(Quantity):
         if isinstance(v, ChemUnitQuantity):
             return v
 
-        if isinstance(v, Quantity):
+        if isinstance(v, Quantity):  # type: ignore[arg-type]
             return ChemUnitQuantity(v.magnitude, v.units)
 
         if isinstance(v, str):
             q = ureg(v)
-            return ChemUnitQuantity(q.magnitude, q.units)
+            return ChemUnitQuantity(q.magnitude, q.units)  # type: ignore[return-value]
 
         if isinstance(v, (int, float)):
             if default_unit is None:
@@ -55,7 +55,7 @@ class ChemUnitQuantity(Quantity):
             return super().__new__(cls, value, unit)  # type: ignore[return-value]
 
         # Case 3: use pint.Quantity as input
-        if isinstance(value, Quantity):
+        if isinstance(value, Quantity):  # type: ignore[arg-type]
             return super().__new__(cls, value.magnitude, value.units)  # type: ignore[return-value]
 
         raise TypeError(f"Invalid input for ChemUnitQuantity: {value!r}, unit={unit!r}")

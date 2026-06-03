@@ -95,9 +95,10 @@ def _mode_field(layout: ValvePortLayout, *, title: str, description: str):
         title=title,
         description=description,
         json_schema_extra={
+            "visible": False,
             "group": GroupParameterCategory.PROPERTY.value,
             "editable": False,
-            "creation_editable": True,
+            "creation_editable": False,
         },
     )
 

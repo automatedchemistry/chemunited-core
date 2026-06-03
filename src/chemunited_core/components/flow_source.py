@@ -37,7 +37,9 @@ class FlowSourceMode(ComponentMode):
         title="Flow Rate",
         description="Volumetric flow rate imposed at the source port.",
         json_schema_extra={
-            "group": GroupParameterCategory.PROPERTY.value,
+            "group": GroupParameterCategory.STATUS.value,
+            "visible": False,
+            "editable": False,
         },
     )
 

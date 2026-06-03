@@ -3,13 +3,13 @@ from typing import Annotated, ClassVar
 
 from pydantic import Field
 
+from chemunited_core.common.enums import GroupParameterCategory
 from chemunited_core.components import (
     ComponentData,
     ComponentMode,
     PressureControlData,
-    PressureControlMode,
     VesselComponentData,
-    VesselMode,
+    VesselMode
 )
 from chemunited_core.components.enums import ComponentType
 from chemunited_core.utils.internal_quantity import (
@@ -18,7 +18,19 @@ from chemunited_core.utils.internal_quantity import (
 )
 
 
-class SourceMode(PressureControlMode): ...
+class SourceMode(ComponentMode):
+
+    setpoint: Annotated[ChemUnitQuantity, ChemQuantityValidator("bar")] = Field(
+        default=ChemUnitQuantity("1 bar"),
+        title="Pressure",
+        description=(
+            "Pressure at the outlet port. Note: 1 bar is approximately \n"
+            "atmospheric pressure at sea level."
+        ),
+        json_schema_extra={
+            "group": GroupParameterCategory.STATUS.value,
+        },
+    )
 
 
 @dataclass
@@ -46,6 +58,12 @@ class SinkMode(VesselMode):
         },
     )
     heat_exchange: bool = Field(
+        default=False,
+        json_schema_extra={
+            "visible": False,
+        },
+    )
+    pressure_access: bool = Field(
         default=False,
         json_schema_extra={
             "visible": False,

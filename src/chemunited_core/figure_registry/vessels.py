@@ -27,7 +27,7 @@ HEAT_PORT_OFFSET = 14
 
 class FlowReactorMode(PlugFlowMode):
     heat_exchange: bool = Field(
-        default=True,
+        default=False,
         title="Heat Exchange",
         description="Whether the component allows heat exchange.",
         json_schema_extra={

@@ -88,6 +88,29 @@ class SolenoidValveData(ValveComponentData):
                 edge.close()
 
 
+class Solenoid2WayValveMode(ComponentMode):
+    normally_open: bool = Field(
+        default=True,
+        title="Position 1/2",
+        description="The position selected when the valve is not energised.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+            "on_text": "Position 1",
+            "off_text": "Position 2",
+        },
+    )
+    opened: bool = Field(
+        default=True,
+        title="Position 1/2",
+        description="The actual valve position.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+            "on_text": "Position 1",
+            "off_text": "Position 2",
+        },
+    )
+
+
 @dataclass
 class SolenoidValve2WayData(ValveComponentData):
     stator_ports: ValvePortLayout = field(
