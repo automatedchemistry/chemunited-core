@@ -74,5 +74,5 @@ class PressureControlData(ComponentData):
     @override
     def sync_internal_state(self):
         port = self.ports_by_number.get(1)
-        port.boundary.kind = BoundaryConditionKind.PRESSURE
-        port.boundary.value = self.setpoint_pa
+        port.boundary.kind = BoundaryConditionKind.PRESSURE  # type: ignore
+        port.boundary.value = self.setpoint_pa  # type: ignore

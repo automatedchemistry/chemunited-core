@@ -117,8 +117,8 @@ class VesselComponentData(ComponentData):
     capacity: ChemUnitQuantity = ChemUnitQuantity("1 ml")
     top_access: int = 1
     bottom_access: int = 1
-    pressure_access: bool = True
-    heat_exchange: bool = True
+    pressure_access: bool = False   
+    heat_exchange: bool = False
 
     @property
     def capacity_value(self) -> float:

@@ -148,7 +148,9 @@ class SolenoidValve2WayData(ValveComponentData):
 
     @override
     def sync_internal_state(self):
-        super().sync_internal_state()
-        if not self.opened:
-            for edge in self.internal_edges.values():
-                edge.close()
+        if self.opened:
+            self.internal_edges[(0, 1)].open()
+            self.internal_edges[(0, 2)].close()
+        else:
+            self.internal_edges[(0, 1)].close()
+            self.internal_edges[(0, 2)].open()
