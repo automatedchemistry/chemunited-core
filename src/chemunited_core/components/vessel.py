@@ -16,6 +16,7 @@ from typing import Annotated, ClassVar
 from pydantic import Field
 from typing_extensions import override
 
+from chemunited_core.common.constant import ATMOSPHERE_PRESSURE_PA
 from chemunited_core.common.enums import (
     ConnectionType,
     GroupParameterCategory,
@@ -28,8 +29,8 @@ from chemunited_core.utils.internal_quantity import (
 )
 
 from .component import ComponentData, ComponentMode
-from .enums import ComponentType, InternalEdgeRole, PortAccess
-from .internals import DEFAULT_INVENTORY_KEY, InternalEdge, InventoryNode, Port
+from .enums import BoundaryConditionKind, ComponentType, InternalEdgeRole, PortAccess
+from .internals import DEFAULT_INVENTORY_KEY, InternalEdge, InventoryNode, Port, PortBoundaryCondition
 
 
 class VesselMode(ComponentMode):
@@ -173,6 +174,15 @@ class VesselComponentData(ComponentData):
                 ),  # init empty
             )
         }
+
+        if not self.pressure_access:
+            atmo_bc = PortBoundaryCondition(
+                kind=BoundaryConditionKind.PRESSURE,
+                value=float(ATMOSPHERE_PRESSURE_PA),
+            )
+            for port in self.ports_by_number.values():
+                if port.category == ConnectionType.HYDRAULIC:
+                    port.boundary = atmo_bc
 
     @override
     def sync_internal_state(self):
