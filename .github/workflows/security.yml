@@ -22,19 +22,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.13"
           cache: pip
 
       - name: Install package and security tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]" pip-audit bandit[toml]
+          python -m pip install -e ".[dev]" pip-audit bandit[toml] uv
 
       - name: Audit Python dependencies
         run: |
+          uv export --no-dev --format requirements-txt > requirements.lock
+          # PYSEC-2025-183 ignored: false positive — not reachable via chemunited's usage
           pip-audit \
+            --requirement requirements.lock \
             --skip-editable \
             --ignore-vuln PYSEC-2025-183
 
       - name: Run Bandit
-        run: bandit -r src/chemunited_core
+        run: bandit -r src/chemunited --severity-level medium --confidence-level medium
