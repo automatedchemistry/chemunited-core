@@ -30,7 +30,13 @@ from chemunited_core.utils.internal_quantity import (
 
 from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind, ComponentType, InternalEdgeRole, PortAccess
-from .internals import DEFAULT_INVENTORY_KEY, InternalEdge, InventoryNode, Port, PortBoundaryCondition
+from .internals import (
+    DEFAULT_INVENTORY_KEY,
+    InternalEdge,
+    InventoryNode,
+    Port,
+    PortBoundaryCondition,
+)
 
 
 class VesselMode(ComponentMode):
@@ -117,7 +123,7 @@ class VesselComponentData(ComponentData):
     capacity: ChemUnitQuantity = ChemUnitQuantity("1 ml")
     top_access: int = 1
     bottom_access: int = 1
-    pressure_access: bool = False   
+    pressure_access: bool = False
     heat_exchange: bool = False
 
     @property

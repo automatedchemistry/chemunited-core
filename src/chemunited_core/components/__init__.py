@@ -1,5 +1,11 @@
 from .command import PutResult, ScheduledCommand
 from .component import ComponentData, ComponentMode, NeutralComponentData
+from .flow_control import (
+    MassFlowControllerData,
+    MassFlowControllerMode,
+    PumpData,
+    PumpMode,
+)
 from .flow_source import FlowSourceData, FlowSourceMode
 from .junction import JunctionData, JunctionMode
 from .plugflow import PlugFlowComponentData, PlugFlowMode
@@ -14,6 +20,8 @@ __all__ = [
     "NeutralComponentData",
     "FlowSourceData",
     "FlowSourceMode",
+    "MassFlowControllerData",
+    "MassFlowControllerMode",
     "PlugFlowComponentData",
     "PlugFlowMode",
     "PressureControlData",
@@ -22,6 +30,8 @@ __all__ = [
     "BackPressureRegulatorMode",
     "JunctionMode",
     "JunctionData",
+    "PumpData",
+    "PumpMode",
     "ValveComponentData",
     "ValveMode",
     "VesselComponentData",

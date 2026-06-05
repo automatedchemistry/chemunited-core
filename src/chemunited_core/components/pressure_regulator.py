@@ -25,7 +25,7 @@ from chemunited_core.utils.internal_quantity import (
 )
 
 from .component import ComponentData, ComponentMode
-from .enums import ComponentType
+from .enums import ComponentType, InternalEdgeRole
 from .internals import InternalEdge, Port
 
 
@@ -68,6 +68,7 @@ class BackPressureRegulatorData(ComponentData):
             (1, 2): InternalEdge(
                 origin_port=1,
                 destination_port=2,
+                role=InternalEdgeRole.JUNCTION,
             ).close()
         }
         self.internal_inventories = {}

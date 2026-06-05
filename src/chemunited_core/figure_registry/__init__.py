@@ -6,11 +6,13 @@ from chemunited_core.components import (
     FlowSourceMode,
     JunctionData,
     JunctionMode,
+    MassFlowControllerMode,
     NeutralComponentData,
     PlugFlowComponentData,
     PlugFlowMode,
     PressureControlData,
     PressureControlMode,
+    PumpMode,
     VesselComponentData,
     VesselMode,
 )
@@ -18,6 +20,7 @@ from chemunited_core.figure_registry.assemble import (
     Gantry3DData,
     Gantry3DMode,
 )
+from chemunited_core.figure_registry.controllers import MFCComponentData
 from chemunited_core.figure_registry.pipes import (
     SeparatorData,
     SeparatorMode,
@@ -26,9 +29,7 @@ from chemunited_core.figure_registry.pipes import (
     SourceData,
     SourceMode,
 )
-from chemunited_core.figure_registry.pumps import (
-    SyringePumpData,
-)
+from chemunited_core.figure_registry.pumps import HPLCPumpData, SyringePumpData
 from chemunited_core.figure_registry.rotary_valve import (
     FourPortDistributionValveData,
     FourPortDistributionValveMode,
@@ -50,8 +51,8 @@ from chemunited_core.figure_registry.rotary_valve import (
     TwoPortDistributionValveMode,
 )
 from chemunited_core.figure_registry.solenoid_valve import (
-    SolenoidValve2WayData,
     Solenoid2WayValveMode,
+    SolenoidValve2WayData,
     SolenoidValveData,
     SolenoidValveMode,
 )
@@ -91,13 +92,12 @@ COMPONENTS: dict[str, tuple[type[ComponentData], type[ComponentMode]]] = {
         BackPressureRegulatorMode,
     ),
     "Distributor": (JunctionData, JunctionMode),
-    "MFCComponent": (ComponentData, ComponentMode),
+    "MFCComponent": (MFCComponentData, MassFlowControllerMode),
     "Sink": (SinkData, SinkMode),
     "Source": (SourceData, SourceMode),
     "Separator": (SeparatorData, SeparatorMode),
     # pumps
-    # FLAGGED: no core-specific HPLCPump data/mode yet.
-    "HPLCPump": (ComponentData, ComponentMode),
+    "HPLCPump": (HPLCPumpData, PumpMode),
     "SyringePump": (SyringePumpData, FlowSourceMode),
     # sensors
     "FlowMeter": (ComponentData, ComponentMode),

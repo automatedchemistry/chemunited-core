@@ -1,4 +1,13 @@
-from chemunited_core.components import FlowSourceData, PutResult, ScheduledCommand
+from dataclasses import dataclass
+
+from typing_extensions import override
+
+from chemunited_core.components import (
+    FlowSourceData,
+    PumpData,
+    PutResult,
+    ScheduledCommand,
+)
 from chemunited_core.utils.internal_quantity import ChemUnitQuantity
 
 
@@ -42,4 +51,18 @@ class SyringePumpData(FlowSourceData):
             self.sync_internal_state()
             return PutResult()
 
+        return PutResult()
+
+
+@dataclass
+class HPLCPumpData(PumpData):
+
+    @override
+    def apply(self, command: str, **kwargs) -> PutResult:
+        if command == "start":
+            self.flow_rate = ChemUnitQuantity(kwargs["rate"])
+            self._sync()
+        elif command == "stop":
+            self.flow_rate = ChemUnitQuantity("0 ml/min")
+            self._sync()
         return PutResult()

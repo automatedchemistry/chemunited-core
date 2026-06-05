@@ -241,6 +241,7 @@ class SixPortTwoPositionValveMode(ValveMode):
 
 # --- Distribution valves
 
+
 @dataclass
 class TwoPortDistributionValveData(DistributionRotaryValveData):
     stator_ports: ValvePortLayout = field(
