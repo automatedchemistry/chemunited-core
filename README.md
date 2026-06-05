@@ -1,5 +1,10 @@
 # chemunited-core
 
+[![Pre-commit](https://github.com/automatedchemistry/chemunited-core/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/automatedchemistry/chemunited-core/actions/workflows/pre-commit.yml)
+[![Security Analysis](https://github.com/automatedchemistry/chemunited-core/actions/workflows/security.yml/badge.svg)](https://github.com/automatedchemistry/chemunited-core/actions/workflows/security.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/chemunited-core.svg)](https://pypi.org/project/chemunited-core/)
+
 Core data models for orchestration, execution, and simulation of automated chemistry platforms.
 
 `chemunited-core` is the shared schema and runtime-model layer for the ChemUnited stack. It gives downstream packages a consistent way to describe equipment, inter-component connections, internal topology, and unit-aware physical quantities.
