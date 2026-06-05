@@ -27,7 +27,6 @@ from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind, ComponentType, InternalEdgeRole
 from .internals import InternalEdge, Port, PortBoundaryCondition
 
-
 # ---------------------------------------------------------------------------
 # Pump
 # ---------------------------------------------------------------------------

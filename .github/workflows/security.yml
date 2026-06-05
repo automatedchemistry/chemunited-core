@@ -32,11 +32,11 @@ jobs:
 
       - name: Audit Python dependencies
         run: |
-          uv export --no-dev --no-editable --format requirements-txt > requirements.lock
+          uv export --no-dev --format requirements-txt \
+            | grep -v '^-e ' > requirements.lock
           # PYSEC-2025-183 ignored: false positive — not reachable via chemunited's usage
           pip-audit \
             --requirement requirements.lock \
-            --skip-editable \
             --ignore-vuln PYSEC-2025-183
 
       - name: Run Bandit
