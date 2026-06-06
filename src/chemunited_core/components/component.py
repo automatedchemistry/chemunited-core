@@ -19,8 +19,11 @@ from typing import ClassVar
 from pydantic import BaseModel, Field, field_validator
 from typing_extensions import override
 
-from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.common.constant import AMBIENT_TEMPERATURE_K, ATMOSPHERE_PRESSURE_PA
+from chemunited_core.common.enums import GroupParameterCategory, PhaseKind
 from chemunited_core.common.metadata import Element
+from chemunited_core.compounds.entity import IDEAL_GAS_CONSTANT
+from chemunited_core.compounds.pockets import VolumeContentBase
 
 from .command import PutResult
 from .enums import ComponentType
@@ -177,6 +180,29 @@ class ComponentData(Element):
         }
         self.internal_edges = {}
         self.internal_inventories = {}
+
+    def apply_air_defaults(self) -> None:
+        """Fill an empty vessel inventory with air if the user declared nothing.
+
+        No-op when: no inventory, user already declared content, or no capacity_value.
+        PlugFlowComponentData overrides this with its own implementation.
+        """
+        inv = self.internal_inventory
+        if inv is None:
+            return
+        if inv.liq_content.volume + inv.gas_content.volume > 0.0:
+            return
+        capacity = getattr(self, "capacity_value", 0.0)
+        if capacity <= 0.0:
+            return
+        n_air = ATMOSPHERE_PRESSURE_PA * capacity / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        inv.gas_content = VolumeContentBase(
+            phase_kind=PhaseKind.GAS,
+            volume=capacity,
+            initial_species={"air": n_air},
+            initial_pressure=ATMOSPHERE_PRESSURE_PA,
+            initial_temperature=AMBIENT_TEMPERATURE_K,
+        )
 
     """ Commands - status change """
 

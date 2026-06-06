@@ -29,7 +29,7 @@ from chemunited_core.figure_registry.pipes import (
     SourceData,
     SourceMode,
 )
-from chemunited_core.figure_registry.pumps import HPLCPumpData, SyringePumpData
+from chemunited_core.figure_registry.pumps import HPLCPumpData, SyringePumpData, SyringePumpMode
 from chemunited_core.figure_registry.rotary_valve import (
     FourPortDistributionValveData,
     FourPortDistributionValveMode,
@@ -98,7 +98,7 @@ COMPONENTS: dict[str, tuple[type[ComponentData], type[ComponentMode]]] = {
     "Separator": (SeparatorData, SeparatorMode),
     # pumps
     "HPLCPump": (HPLCPumpData, PumpMode),
-    "SyringePump": (SyringePumpData, FlowSourceMode),
+    "SyringePump": (SyringePumpData, SyringePumpMode),
     # sensors
     "FlowMeter": (ComponentData, ComponentMode),
     "PhidgetBubbleSensorComponent": (ComponentData, ComponentMode),

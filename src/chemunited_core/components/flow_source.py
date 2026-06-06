@@ -16,7 +16,8 @@ from typing import Annotated
 from pydantic import Field
 from typing_extensions import override
 
-from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.common.enums import GroupParameterCategory, PhaseKind
+from chemunited_core.compounds import VolumeContentBase
 from chemunited_core.utils.internal_quantity import (
     ChemQuantityValidator,
     ChemUnitQuantity,
@@ -24,7 +25,7 @@ from chemunited_core.utils.internal_quantity import (
 
 from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind
-from .internals import Port, PortBoundaryCondition
+from .internals import DEFAULT_INVENTORY_KEY, InventoryNode, Port, PortBoundaryCondition
 
 
 class FlowSourceMode(ComponentMode):
@@ -71,6 +72,16 @@ class FlowSourceData(ComponentData):
                 ),
             )
         }
+        self.internal_inventories = {
+            DEFAULT_INVENTORY_KEY: InventoryNode(
+                liq_content=VolumeContentBase(phase_kind=PhaseKind.LIQUID),
+                gas_content=VolumeContentBase(phase_kind=PhaseKind.GAS),
+            )
+        }
+
+    @property
+    def internal_inventory(self) -> InventoryNode:
+        return self.internal_inventories[DEFAULT_INVENTORY_KEY]
 
     @override
     def sync_internal_state(self):

@@ -10,14 +10,18 @@ Sim: InternalEdge.length and diameter are the primary inputs to the
      resistance calculation and the parcel travel-time estimate.
 """
 
-from dataclasses import dataclass
+import math
+from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 
 import numpy as np
 from pydantic import Field
 from typing_extensions import override
 
-from chemunited_core.common.enums import GroupParameterCategory
+from chemunited_core.common.constant import AMBIENT_TEMPERATURE_K, ATMOSPHERE_PRESSURE_PA
+from chemunited_core.common.enums import GroupParameterCategory, PhaseKind
+from chemunited_core.compounds.entity import IDEAL_GAS_CONSTANT
+from chemunited_core.compounds.pockets import VolumeContentBase
 from chemunited_core.utils.internal_quantity import (
     ChemQuantityValidator,
     ChemUnitQuantity,
@@ -64,6 +68,25 @@ class PlugFlowComponentData(ComponentData):
     COMPONENT_TYPE: ClassVar[ComponentType] = ComponentType.UTENSIL
     length: ChemUnitQuantity = ChemUnitQuantity("100 mm")
     diameter: ChemUnitQuantity = ChemUnitQuantity("1 mm")
+    content: list[VolumeContentBase] = field(default_factory=list, init=False)
+
+    def apply_air_defaults(self) -> None:
+        """Fill content with one air segment if the user declared nothing."""
+        if self.content:
+            return
+        volume = math.pi * (self.diameter_value / 2.0) ** 2 * self.length_value
+        if volume <= 0.0:
+            return
+        n_air = ATMOSPHERE_PRESSURE_PA * volume / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        self.content = [
+            VolumeContentBase(
+                phase_kind=PhaseKind.GAS,
+                volume=volume,
+                initial_species={"air": n_air},
+                initial_pressure=ATMOSPHERE_PRESSURE_PA,
+                initial_temperature=AMBIENT_TEMPERATURE_K,
+            )
+        ]
 
     @property
     def capacity(self) -> float:

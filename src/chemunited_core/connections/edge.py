@@ -1,11 +1,15 @@
+import math
 from dataclasses import dataclass, field
 from typing import Annotated
 
 import numpy as np
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
-from ..common.enums import ConnectionType, GroupParameterCategory
+from ..common.constant import AMBIENT_TEMPERATURE_K, ATMOSPHERE_PRESSURE_PA
+from ..common.enums import ConnectionType, GroupParameterCategory, PhaseKind
 from ..common.metadata import Element
+from ..compounds.entity import IDEAL_GAS_CONSTANT
+from ..compounds.pockets import VolumeContentBase
 from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 
 
@@ -187,6 +191,25 @@ class EdgeData(Element):
     inflection_points: list[tuple[float, float]] = field(
         default_factory=list,
     )
+    content: list[VolumeContentBase] = field(default_factory=list)
+
+    def apply_air_defaults(self) -> None:
+        """Fill content with one air segment if the user declared nothing."""
+        if self.content:
+            return
+        volume = math.pi * (self.diameter_value / 2.0) ** 2 * self.length_value
+        if volume <= 0.0:
+            return
+        n_air = ATMOSPHERE_PRESSURE_PA * volume / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        self.content = [
+            VolumeContentBase(
+                phase_kind=PhaseKind.GAS,
+                volume=volume,
+                initial_species={"air": n_air},
+                initial_pressure=ATMOSPHERE_PRESSURE_PA,
+                initial_temperature=AMBIENT_TEMPERATURE_K,
+            )
+        ]
 
     @property
     def name(self) -> str:

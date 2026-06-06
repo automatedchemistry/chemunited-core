@@ -28,6 +28,8 @@ Usage:
 
 from .entity import ChemicalEntity
 
+_AIR = ChemicalEntity(name="air", molecular_weight=28.97, cp_gas=29.1)
+
 
 class Compounds:
     """Project-wide registry of chemical entities.
@@ -44,7 +46,7 @@ class Compounds:
     """
 
     def __init__(self) -> None:
-        self._compounds: dict[str, ChemicalEntity] = {}
+        self._compounds: dict[str, ChemicalEntity] = {"air": _AIR}
 
     def register(self, entity: ChemicalEntity) -> None:
         """Add a chemical entity to the registry.
@@ -59,8 +61,10 @@ class Compounds:
         """Remove all compounds from the registry.
 
         Call this when loading a new project to avoid stale data.
+        Built-in compounds (air) are restored automatically.
         """
         self._compounds.clear()
+        self._compounds["air"] = _AIR
 
     def __getitem__(self, name: str) -> ChemicalEntity:
         """Retrieve a compound by name.
