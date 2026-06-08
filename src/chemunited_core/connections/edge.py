@@ -200,7 +200,11 @@ class EdgeData(Element):
         volume = math.pi * (self.diameter_value / 2.0) ** 2 * self.length_value
         if volume <= 0.0:
             return
-        n_air = ATMOSPHERE_PRESSURE_PA * volume / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        n_air = (
+            ATMOSPHERE_PRESSURE_PA
+            * volume
+            / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        )
         self.content = [
             VolumeContentBase(
                 phase_kind=PhaseKind.GAS,

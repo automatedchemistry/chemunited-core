@@ -207,3 +207,4 @@ CLAUDE.md
 
 .pre-commit-cache*
 pytest-cache*
+.pip-cache/

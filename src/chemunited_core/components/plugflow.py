@@ -18,7 +18,10 @@ import numpy as np
 from pydantic import Field
 from typing_extensions import override
 
-from chemunited_core.common.constant import AMBIENT_TEMPERATURE_K, ATMOSPHERE_PRESSURE_PA
+from chemunited_core.common.constant import (
+    AMBIENT_TEMPERATURE_K,
+    ATMOSPHERE_PRESSURE_PA,
+)
 from chemunited_core.common.enums import GroupParameterCategory, PhaseKind
 from chemunited_core.compounds.entity import IDEAL_GAS_CONSTANT
 from chemunited_core.compounds.pockets import VolumeContentBase
@@ -77,7 +80,11 @@ class PlugFlowComponentData(ComponentData):
         volume = math.pi * (self.diameter_value / 2.0) ** 2 * self.length_value
         if volume <= 0.0:
             return
-        n_air = ATMOSPHERE_PRESSURE_PA * volume / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        n_air = (
+            ATMOSPHERE_PRESSURE_PA
+            * volume
+            / (IDEAL_GAS_CONSTANT * AMBIENT_TEMPERATURE_K)
+        )
         self.content = [
             VolumeContentBase(
                 phase_kind=PhaseKind.GAS,

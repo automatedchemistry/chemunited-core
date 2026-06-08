@@ -12,7 +12,10 @@ from chemunited_core.components import (
     PutResult,
     ScheduledCommand,
 )
-from chemunited_core.utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
+from chemunited_core.utils.internal_quantity import (
+    ChemQuantityValidator,
+    ChemUnitQuantity,
+)
 
 
 class SyringePumpMode(FlowSourceMode):
@@ -30,13 +33,15 @@ class SyringePumpMode(FlowSourceMode):
             "group": GroupParameterCategory.PROPERTY.value,
         },
     )
-    syringe_actual_volume: Annotated[ChemUnitQuantity, ChemQuantityValidator("ml")] = Field(
-        default=ChemUnitQuantity("0 ml"),
-        title="Current Fill Level",
-        description="Amount of liquid currently loaded in the syringe (0 = empty).",
-        json_schema_extra={
-            "group": GroupParameterCategory.STATUS.value,
-        },
+    syringe_actual_volume: Annotated[ChemUnitQuantity, ChemQuantityValidator("ml")] = (
+        Field(
+            default=ChemUnitQuantity("0 ml"),
+            title="Current Fill Level",
+            description="Amount of liquid currently loaded in the syringe (0 = empty).",
+            json_schema_extra={
+                "group": GroupParameterCategory.STATUS.value,
+            },
+        )
     )
     direction_upward: bool = Field(
         default=True,

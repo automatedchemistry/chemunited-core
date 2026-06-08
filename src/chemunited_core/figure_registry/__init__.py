@@ -1,9 +1,11 @@
+from importlib.abc import Traversable
+from importlib.resources import files as _pkg_files
+
 from chemunited_core.components import (
     BackPressureRegulatorData,
     BackPressureRegulatorMode,
     ComponentData,
     ComponentMode,
-    FlowSourceMode,
     JunctionData,
     JunctionMode,
     MassFlowControllerMode,
@@ -15,6 +17,9 @@ from chemunited_core.components import (
     PumpMode,
     VesselComponentData,
     VesselMode,
+)
+from chemunited_core.components import (
+    FlowSourceMode as FlowSourceMode,
 )
 from chemunited_core.figure_registry.assemble import (
     Gantry3DData,
@@ -29,7 +34,11 @@ from chemunited_core.figure_registry.pipes import (
     SourceData,
     SourceMode,
 )
-from chemunited_core.figure_registry.pumps import HPLCPumpData, SyringePumpData, SyringePumpMode
+from chemunited_core.figure_registry.pumps import (
+    HPLCPumpData,
+    SyringePumpData,
+    SyringePumpMode,
+)
 from chemunited_core.figure_registry.rotary_valve import (
     FourPortDistributionValveData,
     FourPortDistributionValveMode,
@@ -76,6 +85,24 @@ from chemunited_core.figure_registry.vessels import (
     VialData,
     VialMode,
 )
+
+_FIGURES = _pkg_files("chemunited_core.figure_registry.figures")
+
+
+def get_figure_svg(name: str) -> str:
+    """Return SVG markup for *name* (filename without .svg extension)."""
+    return _FIGURES.joinpath(f"{name}.svg").read_text(encoding="utf-8")
+
+
+def get_figure_path(name: str) -> Traversable:
+    """Return a Traversable for the SVG file (zip-safe; use open() or as_file())."""
+    return _FIGURES.joinpath(f"{name}.svg")
+
+
+def list_figures() -> list[str]:
+    """Return sorted list of available figure names (without .svg extension)."""
+    return sorted(p.name[:-4] for p in _FIGURES.iterdir() if p.name.endswith(".svg"))
+
 
 COMPONENTS: dict[str, tuple[type[ComponentData], type[ComponentMode]]] = {
     # analytics

@@ -83,6 +83,12 @@ class FlowSourceData(ComponentData):
     def internal_inventory(self) -> InventoryNode:
         return self.internal_inventories[DEFAULT_INVENTORY_KEY]
 
+    @internal_inventory.setter
+    def internal_inventory(self, inventory: InventoryNode | None) -> None:
+        self.internal_inventories = (
+            {} if inventory is None else {DEFAULT_INVENTORY_KEY: inventory}
+        )
+
     @override
     def sync_internal_state(self):
         self.ports_by_number[1].boundary.value = self.flow_rate_si
