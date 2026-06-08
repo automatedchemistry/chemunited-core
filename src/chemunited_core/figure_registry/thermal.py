@@ -13,7 +13,7 @@ class TemperatureControlMode(ComponentMode): ...
 @dataclass
 class TemperatureControlData(NeutralComponentData):
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1,)]
         self.ports_by_number = {
             1: Port(
@@ -33,7 +33,7 @@ class PeltierCoolerTemperatureControlMode(ComponentMode): ...
 @dataclass
 class PeltierCoolerTemperatureControlData(NeutralComponentData):
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1,)]
         self.ports_by_number = {
             1: Port(

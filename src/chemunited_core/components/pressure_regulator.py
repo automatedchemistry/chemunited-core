@@ -55,10 +55,10 @@ class BackPressureRegulatorData(ComponentData):
     @property
     def setpoint_pa(self) -> float:
         """Setpoint in Pascals for the hydraulic solver."""
-        return self.setpoint.to_base_units().magnitude
+        return float(self.setpoint.to_base_units().magnitude)
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name),  # upstream

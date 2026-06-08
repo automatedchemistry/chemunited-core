@@ -54,10 +54,10 @@ class PressureControlData(ComponentData):
 
     @property
     def setpoint_pa(self) -> float:
-        return self.setpoint.to_base_units().magnitude
+        return float(self.setpoint.to_base_units().magnitude)
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1,)]
         self.ports_by_number = {
             1: Port(
@@ -72,7 +72,7 @@ class PressureControlData(ComponentData):
         self.internal_inventories = {}
 
     @override
-    def sync_internal_state(self):
+    def sync_internal_state(self) -> None:
         port = self.ports_by_number.get(1)
         port.boundary.kind = BoundaryConditionKind.PRESSURE  # type: ignore
         port.boundary.value = self.setpoint_pa  # type: ignore

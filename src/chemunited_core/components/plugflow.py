@@ -97,18 +97,18 @@ class PlugFlowComponentData(ComponentData):
 
     @property
     def capacity(self) -> float:
-        return self.length_value * np.pi * self.diameter**2 / 4  # m**3
+        return float(self.length_value * np.pi * self.diameter**2 / 4)  # m**3
 
     @property
     def length_value(self) -> float:
-        return self.length.to_base_units().magnitude
+        return float(self.length.to_base_units().magnitude)
 
     @property
     def diameter_value(self) -> float:
-        return self.diameter.to_base_units().magnitude
+        return float(self.diameter.to_base_units().magnitude)
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(number=1, component=self.name, relative_position=(-1, 0)),
@@ -124,7 +124,7 @@ class PlugFlowComponentData(ComponentData):
         }
 
     @override
-    def sync_internal_state(self):
-        edge = self.internal_edges.get((1, 2))
+    def sync_internal_state(self) -> None:
+        edge = self.internal_edges[(1, 2)]
         edge.length = self.length_value
         edge.diameter = self.diameter_value

@@ -125,7 +125,7 @@ class VialData(VesselComponentData):
         return self.column != 1 or self.row != 1
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         if not self.is_array:
             super().internal_structure()
             return

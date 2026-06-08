@@ -75,14 +75,14 @@ class SolenoidValveData(ValveComponentData):
         return PutResult()
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         super().internal_structure()
         self.ports_by_number[1].relative_position = (-22.5, 12.5)
         self.ports_by_number[2].relative_position = (22.5, 12.5)
         self.sync_internal_state()
 
     @override
-    def sync_internal_state(self):
+    def sync_internal_state(self) -> None:
         super().sync_internal_state()
         if not self.opened:
             for edge in self.internal_edges.values():
@@ -139,7 +139,7 @@ class SolenoidValve2WayData(ValveComponentData):
         return PutResult()
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         super().internal_structure()
         self.ports_by_number[0].relative_position = (20, 10)
         self.ports_by_number[1].relative_position = (-20, 4)
@@ -147,7 +147,7 @@ class SolenoidValve2WayData(ValveComponentData):
         self.sync_internal_state()
 
     @override
-    def sync_internal_state(self):
+    def sync_internal_state(self) -> None:
         if self.opened:
             self.internal_edges[(0, 1)].open()
             self.internal_edges[(0, 2)].close()

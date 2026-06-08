@@ -9,18 +9,18 @@ class ChemUnitQuantity(Quantity):
     # ----------- Construction Helpers -----------
 
     @classmethod
-    def parse(cls, v):
-        if isinstance(v, Quantity):  # type: ignore[arg-type]
+    def parse(cls, v: object) -> "ChemUnitQuantity":
+        if isinstance(v, Quantity):
             return cls(v.magnitude, v.units)
         if isinstance(v, str):
             q = ureg(v)
-            return cls(q.magnitude, q.units)  # type: ignore[return-value]
+            return cls(q.magnitude, q.units)
         if isinstance(v, (int, float)):
             raise ValueError("Numeric values require a unit")
         raise ValueError(f"Unsupported type: {type(v)}")
 
     @staticmethod
-    def from_any(v, default_unit=None):
+    def from_any(v: object, default_unit: object | None = None) -> "ChemUnitQuantity":
         """
         Parse from:
         - pint.Quantity
@@ -30,12 +30,12 @@ class ChemUnitQuantity(Quantity):
         if isinstance(v, ChemUnitQuantity):
             return v
 
-        if isinstance(v, Quantity):  # type: ignore[arg-type]
+        if isinstance(v, Quantity):
             return ChemUnitQuantity(v.magnitude, v.units)
 
         if isinstance(v, str):
             q = ureg(v)
-            return ChemUnitQuantity(q.magnitude, q.units)  # type: ignore[return-value]
+            return ChemUnitQuantity(q.magnitude, q.units)
 
         if isinstance(v, (int, float)):
             if default_unit is None:
@@ -55,36 +55,36 @@ class ChemUnitQuantity(Quantity):
             return super().__new__(cls, value, unit)  # type: ignore[return-value]
 
         # Case 3: use pint.Quantity as input
-        if isinstance(value, Quantity):  # type: ignore[arg-type]
+        if isinstance(value, Quantity):
             return super().__new__(cls, value.magnitude, value.units)  # type: ignore[return-value]
 
         raise TypeError(f"Invalid input for ChemUnitQuantity: {value!r}, unit={unit!r}")
 
     # ----------- ADDITION (a + b) -----------
 
-    def __add__(self, other):
+    def __add__(self, other: object) -> "ChemUnitQuantity":
         other_q = self.from_any(other, default_unit=self.units)
         result = super().__add__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __radd__(self, other):  # type: ignore[override]
+    def __radd__(self, other: object) -> "ChemUnitQuantity":
         return self.__add__(other)
 
     # ----------- SUBTRACTION (a - b) -----------
 
-    def __sub__(self, other):
+    def __sub__(self, other: object) -> "ChemUnitQuantity":
         other_q = self.from_any(other, default_unit=self.units)
         result = super().__sub__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: object) -> "ChemUnitQuantity":
         other_q = self.from_any(other, default_unit=self.units)
         result = other_q.__sub__(self)  # the order flips here
         return ChemUnitQuantity(result.magnitude, result.units)
 
     # ----------- MULTIPLICATION (a * b) -----------
 
-    def __mul__(self, other):
+    def __mul__(self, other: object) -> "ChemUnitQuantity":
         if isinstance(other, (int, float)):
             result = super().__mul__(other)
             return ChemUnitQuantity(result.magnitude, result.units)
@@ -94,12 +94,12 @@ class ChemUnitQuantity(Quantity):
         result = super().__mul__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __rmul__(self, other):  # type: ignore[override]
+    def __rmul__(self, other: object) -> "ChemUnitQuantity":
         return self.__mul__(other)
 
     # ----------- DIVISION (a / b) -----------
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: object) -> "ChemUnitQuantity":
         if isinstance(other, (int, float)):
             result = super().__truediv__(other)
             return ChemUnitQuantity(result.magnitude, result.units)
@@ -108,20 +108,20 @@ class ChemUnitQuantity(Quantity):
         result = super().__truediv__(other_q)
         return ChemUnitQuantity(result.magnitude, result.units)
 
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other: object) -> "ChemUnitQuantity":
         other_q = self.from_any(other)
         result = other_q.__truediv__(self)
         return ChemUnitQuantity(result.magnitude, result.units)
 
     # ----------- PRETTY PRINT -----------
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<ChemUnitQuantity({self.magnitude}, '{self.units}')>"
 
 
 class ChemQuantityValidator(PydanticPintQuantity):
 
-    def __init__(self, _arg, **kwargs):
+    def __init__(self, _arg: str, **kwargs) -> None:
         kwargs.update(strict=False, ser_mode="str", ureg=ureg)
         super().__init__(_arg, **kwargs)
 

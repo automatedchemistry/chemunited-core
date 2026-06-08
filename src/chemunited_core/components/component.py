@@ -164,10 +164,10 @@ class ComponentData(Element):
 
     """ Initialization """
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.internal_structure()
 
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1, 2)]
         self.ports_by_number = {
             1: Port(
@@ -213,7 +213,8 @@ class ComponentData(Element):
 
     """ Commands - status change """
 
-    def put(self, command: str, **kwargs): ...
+    def put(self, command: str, **kwargs) -> PutResult:
+        return PutResult()
 
     def apply(self, command: str, **kwargs) -> PutResult:
         """Apply a command, mutating runtime state for the live simulation.
@@ -230,11 +231,11 @@ class ComponentData(Element):
         """
         return PutResult()
 
-    def get(self, command: str, **kwargs): ...
+    def get(self, command: str, **kwargs) -> None: ...
 
 
 @dataclass
 class NeutralComponentData(ComponentData):
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         pass

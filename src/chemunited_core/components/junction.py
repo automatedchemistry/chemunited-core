@@ -56,7 +56,7 @@ class JunctionData(ComponentData):
     internal_radius: float = 30
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(i + 1, 0) for i in range(self.number_ports)]
         self.ports_by_number = {
             0: Port(number=0, component=self.name, show_in_graph=False)

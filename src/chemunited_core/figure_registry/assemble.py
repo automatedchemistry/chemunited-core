@@ -83,7 +83,7 @@ class Gantry3DData(ComponentData):
     connections_number: int = 40
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1, i + 2) for i in range(self.connections_number)]
         self.ports_by_number = {
             1: Port(
@@ -92,7 +92,7 @@ class Gantry3DData(ComponentData):
                 relative_position=(0, -1.05 * PATTERN_DIMENSION),
             )
         }
-        factor_y = 1
+        factor_y: float = 1
         factor_x = 0
         for i in range(self.connections_number):
             if i % 20 == 0:

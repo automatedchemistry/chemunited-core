@@ -128,10 +128,10 @@ class VesselComponentData(ComponentData):
 
     @property
     def capacity_value(self) -> float:
-        return self.capacity.to_base_units().magnitude
+        return float(self.capacity.to_base_units().magnitude)
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         n = self.top_access + self.bottom_access
         self.port_pairs = [(i + 1,) for i in range(n + 1)]
         self.ports_by_number = {}
@@ -191,7 +191,7 @@ class VesselComponentData(ComponentData):
                     port.boundary = atmo_bc
 
     @override
-    def sync_internal_state(self):
+    def sync_internal_state(self) -> None:
         inventory = self.internal_inventories.get(DEFAULT_INVENTORY_KEY)
         if inventory is not None:
             inventory.gas_content.volume = self.capacity_value

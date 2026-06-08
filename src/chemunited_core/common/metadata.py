@@ -7,7 +7,7 @@ from pydantic import BaseModel
 @dataclass
 class Element:
     @staticmethod
-    def _ensure_mode(mode: BaseModel, method_name: str):
+    def _ensure_mode(mode: BaseModel, method_name: str) -> None:
         if not isinstance(mode, BaseModel):
             raise TypeError(
                 f"{method_name} expects a Pydantic BaseModel instance, "
@@ -15,7 +15,7 @@ class Element:
             )
 
     @classmethod
-    def _ensure_dataclass_type(cls):
+    def _ensure_dataclass_type(cls) -> None:
         if not is_dataclass(cls):
             raise TypeError(f"{cls.__name__} must be a dataclass to use this method.")
 
@@ -86,4 +86,4 @@ class Element:
 
         return self
 
-    def sync_internal_state(self): ...
+    def sync_internal_state(self) -> None: ...

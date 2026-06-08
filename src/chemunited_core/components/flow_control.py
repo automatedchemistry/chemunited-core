@@ -56,7 +56,7 @@ class PumpData(ComponentData):
 
     @property
     def flow_rate_si(self) -> float:
-        return self.flow_rate.to_base_units().magnitude  # m³/s
+        return float(self.flow_rate.to_base_units().magnitude)  # m³/s
 
     @override
     def internal_structure(self) -> None:
@@ -127,7 +127,7 @@ class MassFlowControllerData(ComponentData):
 
     @property
     def setpoint_si(self) -> float:
-        return self.setpoint.to_base_units().magnitude  # m³/s
+        return float(self.setpoint.to_base_units().magnitude)  # m³/s
 
     @override
     def internal_structure(self) -> None:

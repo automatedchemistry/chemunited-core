@@ -28,7 +28,7 @@ class MultiChannelData(NeutralComponentData):
     active: list[bool] = field(default_factory=list)
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.active = [False] * self.channels
         self.port_pairs = [(i + 1,) for i in range(self.channels)]
         self.ports_by_number = {

@@ -150,7 +150,7 @@ class ValveComponentData(ComponentData):
     hub_ports: ClassVar[tuple[int, ...]] = ()
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         connections = possibles_connections_pairs(
             stator_ports=self.stator_ports,
             rotor_ports=self.rotor_ports,
@@ -193,7 +193,7 @@ class ValveComponentData(ComponentData):
                 )
 
     @override
-    def sync_internal_state(self):
+    def sync_internal_state(self) -> None:
         for edge in self.internal_edges.values():
             edge.close()
 

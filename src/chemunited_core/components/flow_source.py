@@ -58,10 +58,10 @@ class FlowSourceData(ComponentData):
 
     @property
     def flow_rate_si(self) -> float:
-        return self.flow_rate.to_base_units().magnitude  # m³/s
+        return float(self.flow_rate.to_base_units().magnitude)  # m³/s
 
     @override
-    def internal_structure(self):
+    def internal_structure(self) -> None:
         self.port_pairs = [(1,)]
         self.ports_by_number = {
             1: Port(
@@ -90,5 +90,7 @@ class FlowSourceData(ComponentData):
         )
 
     @override
-    def sync_internal_state(self):
-        self.ports_by_number[1].boundary.value = self.flow_rate_si
+    def sync_internal_state(self) -> None:
+        boundary = self.ports_by_number[1].boundary
+        assert boundary is not None
+        boundary.value = self.flow_rate_si
