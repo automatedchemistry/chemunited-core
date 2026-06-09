@@ -8,6 +8,7 @@ def test_public_packages_import() -> None:
         "chemunited_core.components",
         "chemunited_core.connections",
         "chemunited_core.utils",
+        "chemunited_core.protocols",
     ]
 
     for module_name in module_names:
