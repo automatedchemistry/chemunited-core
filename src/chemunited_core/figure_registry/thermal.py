@@ -45,3 +45,10 @@ class PeltierCoolerTemperatureControlData(NeutralComponentData):
         }
         self.internal_edges = {}
         self.internal_inventories = {}
+
+
+class HeiConnectTemperatureControlMode(ComponentMode): ...
+
+
+@dataclass
+class HeiConnectTemperatureControlData(TemperatureControlData):...

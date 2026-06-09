@@ -42,3 +42,21 @@ class MultiChannelData(NeutralComponentData):
         }
         self.internal_edges = {}
         self.internal_inventories = {}
+
+
+class StirringControlMode(ComponentMode):
+    set_point: int = Field(
+        default=0,
+        title="Set Point",
+        description="Set point for the stirring control (rpm)",
+        json_schema_extra={
+            "group": GroupParameterCategory.GENERAL.value,
+            "editable": True,
+        },
+        ge=0,
+        le=1000,
+    )
+
+
+@dataclass
+class StirringControlData(NeutralComponentData):...
