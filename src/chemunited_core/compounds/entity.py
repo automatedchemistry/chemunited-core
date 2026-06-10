@@ -23,6 +23,12 @@ from chemunited_core.utils.internal_quantity import (
 IDEAL_GAS_CONSTANT = 8.314  # J/(mol*K)
 
 
+def _quantity_with_default_unit(value: object, unit: str) -> object:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return ChemUnitQuantity(value, unit)
+    return value
+
+
 class ChemicalEntity(BaseModel):
     """Static descriptor for a pure chemical substance."""
 
@@ -128,6 +134,21 @@ class ChemicalEntity(BaseModel):
             json_schema_extra={"group": "Design"},
         ),
     ]
+
+    @field_validator("molecular_weight", mode="before")
+    @classmethod
+    def coerce_molecular_weight(cls, value: object) -> object:
+        return _quantity_with_default_unit(value, "g/mol")
+
+    @field_validator("cp_liquid", "cp_gas", mode="before")
+    @classmethod
+    def coerce_heat_capacity(cls, value: object) -> object:
+        return _quantity_with_default_unit(value, "J/(mol*K)")
+
+    @field_validator("density_liquid", mode="before")
+    @classmethod
+    def coerce_density_liquid(cls, value: object) -> object:
+        return _quantity_with_default_unit(value, "kg/m^3")
 
     @field_validator("molecular_weight")
     @classmethod
