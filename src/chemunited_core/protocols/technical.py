@@ -46,6 +46,48 @@ class TemperatureControlProtocols(ComponentProtocol):
 class PeltierCoolerTemperatureControlProtocols(TemperatureControlProtocols): ...
 
 
+class TemperatureSetPoint(CommandSignature):
+    command: str = "temperature-setpoint"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Get the current temperature setpoint"
+
+
+class GetHeatingMode(CommandSignature):
+    command: str = "heating-mode"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Get the current heating mode (e.g., 'precise', 'fast')"
+
+
+class SetHeatingMode(CommandSignature):
+    command: str = "heating-mode"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Set the heating mode (e.g., 'precise', 'fast')"
+    mode: str = Field(
+        title="Heating Mode",
+        description="Heating mode to set",
+        default="precise",
+        json_schema_extra={
+            "Options": ["precise", "fast"],
+        },
+    )
+
+
+class GetTemperatureControlMode(CommandSignature):
+    command: str = "temperature-control-mode"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Get the current temperature control mode (hotplate or external probe)"
+
+
+class HeiConnectTemperatureControlProtocols(TemperatureControlProtocols):
+
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.commands["temperature-setpoint"] = TemperatureSetPoint
+        self.commands["heating-mode"] = GetHeatingMode
+        self.commands["set_heating_mode"] = SetHeatingMode
+        self.commands["temperature-control-mode"] = GetTemperatureControlMode
+
+
 # --- Length / position control ---
 
 
@@ -293,3 +335,59 @@ class PowerControlProtocols(PowerSwitchProtocols):
         self.commands["read_voltage"] = ReadVoltageParameter
         self.commands["set_current"] = SetCurrentParameter
         self.commands["set_voltage"] = SetVoltageParameter
+
+
+# --- Stirring control ---
+
+
+class SetSpeed(CommandSignature):
+    command: str = "speed"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Set the stirring speed"
+    speed: Annotated[ChemUnitQuantity, ChemQuantityValidator("rpm")] = Field(
+        title="Speed",
+        description="Stirring speed in rpm",
+        default=ChemUnitQuantity("0 rpm"),
+    )
+
+
+class GetSpeed(CommandSignature):
+    command: str = "speed"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Get the current stirring speed"
+
+
+class GetSpeedSetPoint(CommandSignature):
+    command: str = "speed-setpoint"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Get the current stirring speed setpoint"
+
+
+class PowerOnStirring(CommandSignature):
+    command: str = "power-on"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Turn on stirring"
+
+
+class PowerOffStirring(CommandSignature):
+    command: str = "power-off"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Turn off stirring"
+
+
+class ReadStirringPowerState(CommandSignature):
+    command: str = "is-on"
+    method: Literal["GET", "PUT"] = "GET"
+    description: str = "Read the current power state of the stirrer (ON/OFF)"
+
+
+class StirringControlProtocols(ComponentProtocol):
+
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.commands["speed"] = SetSpeed
+        self.commands["get_speed"] = GetSpeed
+        self.commands["speed-setpoint"] = GetSpeedSetPoint
+        self.commands["power-on"] = PowerOnStirring
+        self.commands["power-off"] = PowerOffStirring
+        self.commands["is-on"] = ReadStirringPowerState

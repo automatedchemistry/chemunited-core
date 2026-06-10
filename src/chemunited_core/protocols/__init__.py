@@ -24,6 +24,8 @@ from .technical import (
     PeltierCoolerTemperatureControlProtocols,
     PhotoReactorProtocols,
     TemperatureControlProtocols,
+    StirringControlProtocols,
+    HeiConnectTemperatureControlProtocols,
 )
 from .valves import (
     FourPortDistributionValveProtocols,
@@ -70,4 +72,6 @@ __all__ = [
     "PhotoSensorProtocols",
     "PressureSensorProtocols",
     "PressureControlProtocols",
+    "StirringControlProtocols",
+    "HeiConnectTemperatureControlProtocols",
 ]
