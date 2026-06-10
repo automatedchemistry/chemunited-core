@@ -11,8 +11,8 @@ class MFCComponentData(MassFlowControllerData):
 
     @override
     def apply(self, command: str, **kwargs) -> PutResult:
-        if command == "set":
-            self.setpoint = ChemUnitQuantity(kwargs["setpoint"])
-            if self.setpoint_si <= 0.0:
+        if command == "set-flow-rate":
+            self.flowrate = ChemUnitQuantity(kwargs["flowrate"])
+            if self.flowrate_si <= 0.0:
                 self.internal_edges[(1, 2)].close()
         return PutResult()

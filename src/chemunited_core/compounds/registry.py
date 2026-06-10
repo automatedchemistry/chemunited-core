@@ -12,10 +12,10 @@ Usage:
     # Register a compound (done at project load time by the GUI)
     COMPOUNDS.register(ChemicalEntity(
         name="water",
-        molecular_weight=18.015,
-        cp_liquid=75.3,
-        cp_gas=33.6,
-        density_liquid=997.0,
+        molecular_weight="18.015 g/mol",
+        cp_liquid="75.3 J/(mol*K)",
+        cp_gas="33.6 J/(mol*K)",
+        density_liquid="997 kg/m^3",
     ))
 
     # Read a compound (done by sim layer or GUI property panels)
@@ -28,7 +28,7 @@ Usage:
 
 from .entity import ChemicalEntity
 
-_AIR = ChemicalEntity(name="air", molecular_weight=28.97, cp_gas=29.1)
+_AIR = ChemicalEntity()
 
 
 class Compounds:

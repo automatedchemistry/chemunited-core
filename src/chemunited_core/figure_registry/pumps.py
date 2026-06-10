@@ -18,6 +18,27 @@ from chemunited_core.utils.internal_quantity import (
 )
 
 
+@dataclass
+class HPLCPumpData(PumpData):
+
+    @override
+    def apply(self, command: str, **kwargs) -> PutResult:
+        if command == "infuse":
+            self.flow_rate = ChemUnitQuantity(kwargs["rate"])
+            self._sync()
+            scheduled: list[ScheduledCommand] = []
+            if "volume" in kwargs:
+                flow_rate_si = self.flow_rate_si
+                volume_si = ChemUnitQuantity(kwargs["volume"]).to_base_units().magnitude
+                dt = volume_si / flow_rate_si
+                scheduled.append(ScheduledCommand(dt=dt, command="stop"))
+                return PutResult(scheduled=scheduled)
+        elif command == "stop":
+            self.flow_rate = ChemUnitQuantity("0 ml/min")
+            self._sync()
+        return PutResult()
+
+
 class SyringePumpMode(FlowSourceMode):
     """User-configurable parameters for a syringe pump.
 
@@ -116,15 +137,3 @@ class SyringePumpData(FlowSourceData):
         return PutResult()
 
 
-@dataclass
-class HPLCPumpData(PumpData):
-
-    @override
-    def apply(self, command: str, **kwargs) -> PutResult:
-        if command == "start":
-            self.flow_rate = ChemUnitQuantity(kwargs["rate"])
-            self._sync()
-        elif command == "stop":
-            self.flow_rate = ChemUnitQuantity("0 ml/min")
-            self._sync()
-        return PutResult()

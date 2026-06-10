@@ -313,7 +313,7 @@ COMPONENTS: dict[str, ComponentDefinition] = {
     ),
     "StirringControl": ComponentDefinition(
         StirringControlData, StirringControlMode,
-        figure_base="Stirring", svg_scale=0.8, category="technical",
+        figure_base="Stirring", svg_scale=2.0, category="technical",
     ),
     # thermal
     "HeiConnectTemperatureControl": ComponentDefinition(
