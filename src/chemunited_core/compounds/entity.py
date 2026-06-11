@@ -186,29 +186,28 @@ class ChemicalEntity(BaseModel):
             f"{self.color_blue:02X}{self.color_alpha:02X}"
         )
 
-    def molar_volume_gas(self, temperature: float, pressure: float) -> ChemUnitQuantity:
-        """Ideal-gas molar volume in m^3/mol."""
-        value = IDEAL_GAS_CONSTANT * temperature / pressure
-        return ChemUnitQuantity(value, "m^3/mol")
+    def molar_volume_gas(self, temperature: float, pressure: float) -> float:
+        """Ideal-gas molar volume in m³/mol."""
+        return IDEAL_GAS_CONSTANT * temperature / pressure
 
-    def molar_volume_liquid(self) -> ChemUnitQuantity:
-        """Liquid molar volume in m^3/mol derived from density."""
+    def molar_volume_liquid(self) -> float:
+        """Liquid molar volume in m³/mol derived from density."""
         if self.density_liquid <= ChemUnitQuantity("0 kg/m^3"):
             raise ValueError(
                 f"density_liquid is not defined for compound '{self.name}'."
             )
-        return (self.molecular_weight / self.density_liquid).to("m^3/mol")
+        return float((self.molecular_weight / self.density_liquid).to("m^3/mol").magnitude)
 
-    def cp(self, phase: str) -> ChemUnitQuantity:
-        """Heat capacity for the requested phase."""
+    def cp(self, phase: str) -> float:
+        """Molar heat capacity in J/(mol·K) for the requested phase."""
         if phase == "liquid":
             if self.cp_liquid <= ChemUnitQuantity("0 J/(mol*K)"):
                 raise ValueError(
                     f"cp_liquid is not defined for compound '{self.name}'."
                 )
-            return self.cp_liquid
+            return float(self.cp_liquid.magnitude)
         if phase == "gas":
             if self.cp_gas <= ChemUnitQuantity("0 J/(mol*K)"):
                 raise ValueError(f"cp_gas is not defined for compound '{self.name}'.")
-            return self.cp_gas
+            return float(self.cp_gas.magnitude)
         raise ValueError(f"Unknown phase '{phase}'. Expected 'liquid' or 'gas'.")

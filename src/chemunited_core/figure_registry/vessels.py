@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import Annotated, ClassVar
 
 from pydantic import Field
 from typing_extensions import override
@@ -18,6 +18,7 @@ from chemunited_core.components import (
 from chemunited_core.components.enums import ComponentType, InternalEdgeRole
 from chemunited_core.components.internals import InternalEdge, InventoryNode, Port
 from chemunited_core.compounds import VolumeContentBase
+from chemunited_core.utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 
 CELL_SIZE = 40
 ROW_HEADER_WIDTH = 12
@@ -37,11 +38,49 @@ class FlowReactorMode(PlugFlowMode):
             "lock_reason": "Internal Chosen",
         },
     )
+    temperature: Annotated[ChemUnitQuantity, ChemQuantityValidator("K")] = Field(
+        default=ChemUnitQuantity("298 K"),
+        title="Temperature",
+        description="Operating temperature of the component.",
+        json_schema_extra={
+            "group": GroupParameterCategory.STATUS.value,
+        },       
+    )    
+    heat_transfer_coefficient: Annotated[
+        ChemUnitQuantity,
+        ChemQuantityValidator("W/(m^2*K)")
+    ] = Field(
+        default=ChemUnitQuantity("1000 W/(m^2*K)"),
+        title="Heat Transfer Coefficient",
+        description="Heat transfer coefficient for the component surface.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+        },
+    )
+    diameter: Annotated[ChemUnitQuantity, ChemQuantityValidator("m")] = Field(
+        default=ChemUnitQuantity("0.05 m"),
+        title="Diameter",
+        description="Diameter of the component.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+        },
+    )
 
 
 @dataclass
 class FlowReactorData(PlugFlowComponentData):
     heat_exchange: bool = True
+    temperature: ChemUnitQuantity = ChemUnitQuantity("298 K")
+    heat_transfer_coefficient: ChemUnitQuantity = ChemUnitQuantity("1000 W/(m^2*K)")
+    diameter: ChemUnitQuantity = ChemUnitQuantity("0.05 m")
+
+    @property
+    def heat_transfer_coefficient_value(self) -> float:
+        return float(self.heat_transfer_coefficient.to_base_units().magnitude)
+
+    @property
+    def temperature_value(self) -> float:
+        return float(self.temperature.to_base_units().magnitude)
 
 
 class PhotoReactorMode(FlowReactorMode): ...
@@ -211,5 +250,13 @@ class VialMode(VesselMode):
         default=0,
         json_schema_extra={
             "visible": False,
+        },
+    )
+    diameter: Annotated[ChemUnitQuantity, ChemQuantityValidator("m")] = Field(
+        default=ChemUnitQuantity("0.01 m"),
+        title="Diameter",
+        description="Diameter of the component.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
         },
     )

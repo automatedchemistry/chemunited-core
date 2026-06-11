@@ -15,6 +15,7 @@ from typing import Annotated, ClassVar
 
 from pydantic import Field
 from typing_extensions import override
+import numpy as np
 
 from chemunited_core.common.constant import ATMOSPHERE_PRESSURE_PA
 from chemunited_core.common.enums import (
@@ -100,7 +101,37 @@ class VesselMode(ComponentMode):
             "lock_reason": "Internal Chosen",
         },
     )
-
+    surface_temperature: Annotated[
+        ChemUnitQuantity,
+        ChemQuantityValidator("K")
+    ] = Field(
+        default=ChemUnitQuantity("298.15 K"),
+        title="Surface Temperature",
+        description="Temperature of the vessel surface.",
+        json_schema_extra={
+            "group": GroupParameterCategory.STATUS.value,
+        },
+    )
+    heat_transfer_coefficient: Annotated[
+        ChemUnitQuantity,
+        ChemQuantityValidator("W/(m^2*K)")
+    ] = Field(
+        default=ChemUnitQuantity("1000 W/(m^2*K)"),  
+        # typical value for a well-mixed vessel with good thermal contact
+        title="Heat Transfer Coefficient",
+        description="Heat transfer coefficient for the vessel surface.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+        },
+    )
+    diameter: Annotated[ChemUnitQuantity, ChemQuantityValidator("m")] = Field(
+        default=ChemUnitQuantity("0.05 m"),
+        title="Diameter",
+        description="Diameter of the component.",
+        json_schema_extra={
+            "group": GroupParameterCategory.PROPERTY.value,
+        },
+    )
 
 def _centered_offsets(count: int) -> list[float]:
     center = (12 * count - 1) / 2
@@ -125,10 +156,32 @@ class VesselComponentData(ComponentData):
     bottom_access: int = 1
     pressure_access: bool = False
     heat_exchange: bool = False
-
+    temperature: ChemUnitQuantity = ChemUnitQuantity("298 K")
+    heat_transfer_coefficient: ChemUnitQuantity = ChemUnitQuantity("1000 W/(m^2*K)")
+    diameter: ChemUnitQuantity = ChemUnitQuantity("0.05 m")
     @property
     def capacity_value(self) -> float:
         return float(self.capacity.to_base_units().magnitude)
+    
+    @property
+    def heat_transfer_coefficient_value(self) -> float:
+        return float(self.heat_transfer_coefficient.to_base_units().magnitude)
+    
+    @property
+    def temperature_value(self) -> float:
+        return float(self.temperature.to_base_units().magnitude)
+    
+    @property
+    def diameter_value(self) -> float:
+        return float(self.diameter.to_base_units().magnitude)
+
+    @property
+    def contact_area(self) -> float:
+        radius = self.diameter_value / 2
+        Area_bottom = np.pi * radius**2
+        level_height = self.capacity_value / (np.pi * radius**2)
+        Area_side = np.pi * level_height * radius
+        return Area_bottom + Area_side
 
     @override
     def internal_structure(self) -> None:
