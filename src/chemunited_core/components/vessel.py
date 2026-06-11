@@ -156,20 +156,20 @@ class VesselComponentData(ComponentData):
     bottom_access: int = 1
     pressure_access: bool = False
     heat_exchange: bool = False
-    temperature: ChemUnitQuantity = ChemUnitQuantity("298 K")
+    surface_temperature: ChemUnitQuantity = ChemUnitQuantity("298.15 K")
     heat_transfer_coefficient: ChemUnitQuantity = ChemUnitQuantity("1000 W/(m^2*K)")
     diameter: ChemUnitQuantity = ChemUnitQuantity("0.05 m")
     @property
     def capacity_value(self) -> float:
         return float(self.capacity.to_base_units().magnitude)
-    
+
     @property
     def heat_transfer_coefficient_value(self) -> float:
         return float(self.heat_transfer_coefficient.to_base_units().magnitude)
-    
+
     @property
     def temperature_value(self) -> float:
-        return float(self.temperature.to_base_units().magnitude)
+        return float(self.surface_temperature.to_base_units().magnitude)
     
     @property
     def diameter_value(self) -> float:
