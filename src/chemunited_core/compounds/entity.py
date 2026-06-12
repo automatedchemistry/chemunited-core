@@ -58,7 +58,7 @@ class ChemicalEntity(BaseModel):
         default=ChemUnitQuantity("0 J/(mol*K)"),
         title="Liquid Heat Capacity",
         description=(
-            "Molar heat capacity of the liquid phase. A value of zero means "
+            "Molar heat capacity of the liquid phase.\n A value of zero means "
             "the liquid phase is not available."
         ),
         json_schema_extra={"group": GroupParameterCategory.PROPERTY.value},
@@ -70,19 +70,19 @@ class ChemicalEntity(BaseModel):
         default=ChemUnitQuantity("29.1 J/(mol*K)"),
         title="Gas Heat Capacity",
         description=(
-            "Molar heat capacity of the gas phase. A value of zero means "
+            "Molar heat capacity of the gas phase.\n A value of zero means "
             "the gas phase is not available."
         ),
         json_schema_extra={"group": GroupParameterCategory.PROPERTY.value},
     )
     density_liquid: Annotated[
         ChemUnitQuantity,
-        ChemQuantityValidator("kg/m^3"),
+        ChemQuantityValidator("kg/m**3"),
     ] = Field(
-        default=ChemUnitQuantity("0 kg/m^3"),
+        default=ChemUnitQuantity("0 kg/m**3"),
         title="Liquid Density",
         description=(
-            "Density of the liquid phase. A value of zero means the liquid "
+            "Density of the liquid phase.\n A value of zero means the liquid "
             "phase is not available."
         ),
         json_schema_extra={"group": GroupParameterCategory.PROPERTY.value},
@@ -128,7 +128,7 @@ class ChemicalEntity(BaseModel):
             le=255,
             title="Transparency",
             description=(
-                "Alpha channel for GUI color visualization. A value of zero is "
+                "Alpha channel for GUI color visualization.\n A value of zero is "
                 "fully transparent and 255 is fully opaque."
             ),
             json_schema_extra={"group": "Design"},
