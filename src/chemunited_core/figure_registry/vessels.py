@@ -92,7 +92,7 @@ class PhotoReactorData(FlowReactorData):
 
 
 class GlassBottleMode(VesselMode):
-    bottom_access: int = Field(
+    top_access: int = Field(
         default=0,
         json_schema_extra={
             "visible": False,
@@ -102,7 +102,7 @@ class GlassBottleMode(VesselMode):
 
 @dataclass
 class GlassBottleData(VesselComponentData):
-    bottom_access: int = 0
+    top_access: int = 0
 
 
 def _position_to_letter(position: int) -> str:
