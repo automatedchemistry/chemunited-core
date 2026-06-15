@@ -284,7 +284,7 @@ COMPONENTS: dict[str, ComponentDefinition] = {
     ),
     "PressureControl": ComponentDefinition(
         PressureControlData, PressureControlMode,
-        port_positions={1: (-33, 26), 2: (40, 26)}, category="sensors",
+        port_positions={1: (40, 26)}, category="sensors",
     ),
     "PressureSensor": ComponentDefinition(
         ComponentData, ComponentMode,
