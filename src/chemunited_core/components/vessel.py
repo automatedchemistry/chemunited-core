@@ -13,9 +13,9 @@ Sim: DigitalTwinAdapter reads InventoryNode initial conditions to seed runtime
 from dataclasses import dataclass
 from typing import Annotated, ClassVar
 
-from pydantic import Field
-from typing_extensions import override
 import numpy as np
+from pydantic import Field, field_validator
+from typing_extensions import override
 
 from chemunited_core.common.constant import ATMOSPHERE_PRESSURE_PA
 from chemunited_core.common.enums import (
@@ -101,22 +101,20 @@ class VesselMode(ComponentMode):
             "lock_reason": "Internal Chosen",
         },
     )
-    surface_temperature: Annotated[
-        ChemUnitQuantity,
-        ChemQuantityValidator("K")
-    ] = Field(
-        default=ChemUnitQuantity("298.15 K"),
-        title="Surface Temperature",
-        description="Temperature of the vessel surface.",
-        json_schema_extra={
-            "group": GroupParameterCategory.STATUS.value,
-        },
+    surface_temperature: Annotated[ChemUnitQuantity, ChemQuantityValidator("K")] = (
+        Field(
+            default=ChemUnitQuantity("298.15 K"),
+            title="Surface Temperature",
+            description="Temperature of the vessel surface.",
+            json_schema_extra={
+                "group": GroupParameterCategory.STATUS.value,
+            },
+        )
     )
     heat_transfer_coefficient: Annotated[
-        ChemUnitQuantity,
-        ChemQuantityValidator("W/(m^2*K)")
+        ChemUnitQuantity, ChemQuantityValidator("W/(m^2*K)")
     ] = Field(
-        default=ChemUnitQuantity("1000 W/(m^2*K)"),  
+        default=ChemUnitQuantity("1000 W/(m^2*K)"),
         # typical value for a well-mixed vessel with good thermal contact
         title="Heat Transfer Coefficient",
         description="Heat transfer coefficient for the vessel surface.",
@@ -132,6 +130,23 @@ class VesselMode(ComponentMode):
             "group": GroupParameterCategory.PROPERTY.value,
         },
     )
+
+    @field_validator("heat_transfer_coefficient")
+    @classmethod
+    def validate_heat_transfer_coefficient(
+        cls, value: ChemUnitQuantity
+    ) -> ChemUnitQuantity:
+        if value < ChemUnitQuantity("0 W/(m^2*K)"):
+            raise ValueError("heat_transfer_coefficient must be >= 0 W/(m^2*K).")
+        return value
+
+    @field_validator("diameter")
+    @classmethod
+    def validate_diameter(cls, value: ChemUnitQuantity) -> ChemUnitQuantity:
+        if value <= ChemUnitQuantity("0 m"):
+            raise ValueError("diameter must be greater than 0 m.")
+        return value
+
 
 def _centered_offsets(count: int) -> list[float]:
     center = (12 * count - 1) / 2
@@ -159,6 +174,7 @@ class VesselComponentData(ComponentData):
     surface_temperature: ChemUnitQuantity = ChemUnitQuantity("298.15 K")
     heat_transfer_coefficient: ChemUnitQuantity = ChemUnitQuantity("1000 W/(m^2*K)")
     diameter: ChemUnitQuantity = ChemUnitQuantity("0.05 m")
+
     @property
     def capacity_value(self) -> float:
         return float(self.capacity.to_base_units().magnitude)
@@ -170,7 +186,7 @@ class VesselComponentData(ComponentData):
     @property
     def temperature_value(self) -> float:
         return float(self.surface_temperature.to_base_units().magnitude)
-    
+
     @property
     def diameter_value(self) -> float:
         return float(self.diameter.to_base_units().magnitude)
