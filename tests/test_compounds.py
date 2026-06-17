@@ -1,7 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
-from chemunited_core.compounds import COMPOUNDS, ChemicalEntity
+from chemunited_core.common.enums import PhaseKind
+from chemunited_core.compounds import (
+    COMPOUNDS,
+    ChemicalEntity,
+    Compounds,
+    VolumeContentBase,
+)
 from chemunited_core.utils.internal_quantity import ChemUnitQuantity
 
 
@@ -129,3 +135,82 @@ def test_compounds_registry_restores_default_air() -> None:
     assert "argon" not in COMPOUNDS
     assert COMPOUNDS["air"].name == "air"
     assert COMPOUNDS["air"].color == "#00000000"
+
+
+def test_compounds_get_color_returns_transparent_for_empty_or_air_gas() -> None:
+    registry = Compounds()
+
+    assert registry.get_color(VolumeContentBase()) == "#FFFFFF00"
+    assert (
+        registry.get_color(
+            VolumeContentBase(
+                phase_kind=PhaseKind.GAS,
+                volume=1.0,
+                initial_species={"air": 41.0},
+            )
+        )
+        == "#FFFFFF00"
+    )
+
+
+def test_compounds_get_color_uses_half_opacity_for_visible_gas() -> None:
+    registry = Compounds()
+    registry.register(ChemicalEntity(name="argon", color_red=255))
+
+    color = registry.get_color(
+        VolumeContentBase(
+            phase_kind=PhaseKind.GAS,
+            initial_species={"air": 10.0, "argon": 2.0},
+        )
+    )
+
+    assert color == "#FF000080"
+
+
+def test_compounds_get_color_uses_full_opacity_for_liquid_mixture() -> None:
+    registry = Compounds()
+    registry.register(ChemicalEntity(name="red", color_red=255))
+    registry.register(ChemicalEntity(name="green", color_green=255))
+
+    color = registry.get_color(
+        VolumeContentBase(
+            phase_kind=PhaseKind.LIQUID,
+            initial_species={"red": 1.0, "green": 1.0},
+        )
+    )
+
+    assert color == "#808000FF"
+
+
+def test_compounds_get_color_ignores_unknown_with_visible_species() -> None:
+    registry = Compounds()
+    registry.register(ChemicalEntity(name="blue", color_blue=255))
+
+    color = registry.get_color(
+        VolumeContentBase(
+            phase_kind=PhaseKind.LIQUID,
+            initial_species={"unknown": 100.0, "blue": 1.0},
+        )
+    )
+
+    assert color == "#0000FFFF"
+
+
+def test_compounds_get_color_returns_transparent_for_only_unknown_species() -> None:
+    registry = Compounds()
+
+    color = registry.get_color(
+        VolumeContentBase(
+            phase_kind=PhaseKind.LIQUID,
+            initial_species={"unknown": 1.0},
+        )
+    )
+
+    assert color == "#FFFFFF00"
+
+
+def test_compounds_get_color_rejects_unknown_phase() -> None:
+    registry = Compounds()
+
+    with pytest.raises(ValueError, match="Unknown phase"):
+        registry.get_color(VolumeContentBase(phase_kind="solid"))

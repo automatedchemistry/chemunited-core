@@ -30,6 +30,7 @@ class SetTemperatureParameter(CommandSignature):
         description="Temperature setpoint",
         default=ChemUnitQuantity("0 C"),
     )
+    feedback_status_command: str = "target-reached"
 
 
 class TemperatureControlProtocols(ComponentProtocol):
@@ -44,6 +45,18 @@ class TemperatureControlProtocols(ComponentProtocol):
 
 
 class PeltierCoolerTemperatureControlProtocols(TemperatureControlProtocols): ...
+
+
+class PowerOnTemperatureControl(CommandSignature):
+    command: str = "power-on"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Turn on temperature controlling"
+
+
+class PowerOffTemperatureControl(CommandSignature):
+    command: str = "power-off"
+    method: Literal["GET", "PUT"] = "PUT"
+    description: str = "Turn off temperature controlling"
 
 
 class TemperatureSetPoint(CommandSignature):
@@ -86,6 +99,8 @@ class HeiConnectTemperatureControlProtocols(TemperatureControlProtocols):
         self.commands["heating-mode"] = GetHeatingMode
         self.commands["set_heating_mode"] = SetHeatingMode
         self.commands["temperature-control-mode"] = GetTemperatureControlMode
+        self.commands["power-on"] = PowerOnTemperatureControl
+        self.commands["power-off"] = PowerOffTemperatureControl
 
 
 # --- Length / position control ---

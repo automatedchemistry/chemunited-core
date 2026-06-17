@@ -26,9 +26,14 @@ Usage:
     COMPOUNDS.clear()
 """
 
+from chemunited_core.common.enums import PhaseKind
+
 from .entity import ChemicalEntity
+from .pockets import VolumeContentBase
 
 _AIR = ChemicalEntity()
+_AIR_SPECIES = "air"
+_TRANSPARENT_COLOR = "#FFFFFF00"
 
 
 class Compounds:
@@ -107,6 +112,64 @@ class Compounds:
         """List of all registered ChemicalEntity objects."""
         return list(self._compounds.values())
 
+    def get_color(self, content: VolumeContentBase) -> str:
+        """Return the display RGBA color for a volume content mixture."""
+        if content.phase_kind == PhaseKind.GAS:
+            return self._blend_colors(content.initial_species, opacity=0.5)
+        if content.phase_kind == PhaseKind.LIQUID:
+            return self._blend_colors(content.initial_species, opacity=1.0)
+
+        raise ValueError(
+            f"Unknown phase '{content.phase_kind}'. Expected 'liquid' or 'gas'."
+        )
+
+    def _blend_colors(self, species_moles: dict[str, float], opacity: float) -> str:
+        """Blend colors of individual compounds based on their mole fractions.
+
+        Args:
+            species_moles: Mapping of species identifier to amount in moles.
+            opacity: Desired opacity level (0.0 to 1.0) for the blended color.
+
+        Returns:
+            A hex color string for the blended color and opacity.
+        """
+        visible_species = {
+            species: moles
+            for species, moles in species_moles.items()
+            if species != _AIR_SPECIES and species in self._compounds and moles > 0
+        }
+        total_moles = sum(visible_species.values())
+        if total_moles == 0:
+            return _TRANSPARENT_COLOR
+
+        r_total, g_total, b_total = 0, 0, 0
+        for species, moles in visible_species.items():
+            entity = self._compounds[species]
+            r, g, b = self._hex_to_rgb(entity.rgb_hex)
+            fraction = moles / total_moles
+            r_total += r * fraction
+            g_total += g * fraction
+            b_total += b * fraction
+
+        r_blend = round(r_total)
+        g_blend = round(g_total)
+        b_blend = round(b_total)
+        a_blend = round(opacity * 255)
+
+        return f"#{r_blend:02X}{g_blend:02X}{b_blend:02X}{a_blend:02X}"
+
+    def _hex_to_rgb(self, color: str) -> tuple[int, int, int]:
+        """Parse a six- or eight-digit hex color into RGB channels."""
+        if not color.startswith("#") or len(color) not in {7, 9}:
+            raise ValueError(
+                f"Invalid color '{color}'. Expected '#RRGGBB' or '#RRGGBBAA'."
+            )
+
+        return (
+            int(color[1:3], 16),
+            int(color[3:5], 16),
+            int(color[5:7], 16),
+        )
 
 # ── Module-level singleton ────────────────────────────────────────────────────
 
