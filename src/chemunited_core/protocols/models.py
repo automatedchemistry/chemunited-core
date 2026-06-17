@@ -12,11 +12,27 @@ class CommandSignature(BaseModel):
     command: str = ""
     method: Literal["GET", "PUT"] = "PUT"
     description: str = ""
-    wait_time: float = 0.0
-    wait_feedback_status: bool = False
-    feedback_status_command: str = ""
+    wait_time: float = Field(
+        default=0.0,
+        title="Wait time after command execution",
+        description="Time in seconds to wait after executing the command."
+    )
+    wait_feedback_status: bool = Field(
+        default=False,
+        title="Wait for feedback status",
+        description="Whether to wait for a feedback status command before proceeding."
+    )
+    feedback_status_command: str = Field(
+        default="",
+        title="Feedback Status Command",
+        description="The command to use for checking feedback status."
+    )
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:6])
-    feedback_answer: str = "true"
+    feedback_answer: str = Field(
+        default="true",
+        title="Expected Feedback Answer",
+        description="The expected answer from the feedback status command to consider the action successful."
+    )
 
     @property
     def resume_id(self) -> str:
