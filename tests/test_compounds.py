@@ -8,7 +8,41 @@ from chemunited_core.compounds import (
     Compounds,
     VolumeContentBase,
 )
-from chemunited_core.utils.internal_quantity import ChemUnitQuantity
+from chemunited_core.utils.internal_quantity import (
+    ChemUnitQuantity,
+    units_for_dimension,
+    ureg,
+)
+
+
+def _dimensions(unit: str):
+    return ureg.Quantity(1, unit).dimensionality
+
+
+@pytest.mark.parametrize(
+    ("unit", "expected"),
+    [
+        ("g/mol", ["g/mol", "kg/mol"]),
+        ("J/(mol*K)", ["J/(mol*K)", "kJ/(mol*K)", "cal/(mol*K)"]),
+        ("kg/m^3", ["kg/m^3", "g/cm^3", "g/ml"]),
+        ("rpm", ["rpm"]),
+    ],
+)
+def test_quantity_units_for_curated_dimensions(
+    unit: str, expected: list[str]
+) -> None:
+    assert units_for_dimension(_dimensions(unit), ureg) == expected
+
+
+def test_quantity_units_for_none_dimension() -> None:
+    assert units_for_dimension(None, ureg) == []
+
+
+def test_quantity_units_for_uncurated_dimension() -> None:
+    units = units_for_dimension(_dimensions("m/s^2"), ureg)
+
+    assert len(units) == 1
+    assert ureg.Quantity(1, units[0]).dimensionality == _dimensions("m/s^2")
 
 
 def test_chemical_entity_default_air_values() -> None:

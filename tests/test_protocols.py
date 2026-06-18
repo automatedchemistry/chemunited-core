@@ -132,6 +132,13 @@ class TestTechnicalProtocols:
         assert "target-reached" in proto.commands
         assert "set_temperature" in proto.commands
 
+    def test_set_temperature_accepts_offset_unit_string(self) -> None:
+        command_type = TemperatureControlProtocols("tc1").commands["set_temperature"]
+
+        command = command_type(component="tc1", temp="10 degC")
+
+        assert command.temp.to("degC").magnitude == pytest.approx(10)
+
     def test_multichannel_adc(self) -> None:
         proto = MultiChannelADCProtocols("adc1")
         assert set(proto.commands) >= {"read", "read_all"}

@@ -27,6 +27,12 @@ class InfuseParameter(CommandSignature):
         description="Volume to infuse",
         default=ChemUnitQuantity("1 ml"),
     )
+    feedback_status_command: str = Field(
+        default="is-pumping",
+        title="Feedback Status Command",
+        description="The command to use for checking feedback status.",
+        json_schema_extra={"group": "Execution Options"}
+    )
 
 
 class StopPumpParameter(CommandSignature):

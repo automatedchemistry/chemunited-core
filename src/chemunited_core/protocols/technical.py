@@ -25,10 +25,10 @@ class SetTemperatureParameter(CommandSignature):
     command: str = "temperature"
     method: Literal["GET", "PUT"] = "PUT"
     description: str = "Set the temperature setpoint"
-    temp: Annotated[ChemUnitQuantity, ChemQuantityValidator("C")] = Field(
+    temp: Annotated[ChemUnitQuantity, ChemQuantityValidator("degC")] = Field(
         title="Temperature",
         description="Temperature setpoint",
-        default=ChemUnitQuantity("0 C"),
+        default=ChemUnitQuantity("0 degC"),
     )
     feedback_status_command: str = "target-reached"
 
@@ -39,7 +39,7 @@ class TemperatureControlProtocols(ComponentProtocol):
         super().__init__(name)
         self.commands["temperature"] = GetTemperatureParameter
         self.commands["target-reached"] = TargetTemperatureReachedParameter
-        self.commands["set_temperature"] = SetTemperatureParameter
+        self.commands["set-temperature"] = SetTemperatureParameter
 
         # TODO: feedback command (poll target-reached after set_temperature)
 
