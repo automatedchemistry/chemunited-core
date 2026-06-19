@@ -49,7 +49,7 @@ Import public symbols from subpackages such as `chemunited_core.components` and 
 | `chemunited_core.components` | Process equipment models | `ComponentMode`, `ComponentData`, `FlowSourceMode`, `FlowSourceData`, `JunctionMode`, `JunctionData`, `PlugFlowMode`, `PlugFlowComponentData`, `PressureControlMode`, `PressureControlData`, `BackPressureRegulatorMode`, `BackPressureRegulatorData`, `ValveMode`, `ValveComponentData`, `VesselMode`, `VesselComponentData` |
 | `chemunited_core.connections` | Inter-component edges | `EdgeMode`, `EdgeData`, `ConnectionType` |
 | `chemunited_core.common` | Shared enums and mode-to-data bridge | `Element`, `ConnectionType`, `GroupParameterCategory` |
-| `chemunited_core.utils` | Unit-aware physical quantities | `ChemUnitQuantity`, `ChemQuantityValidator`, `ureg` |
+| `chemunited_quantities` | Unit-aware physical quantities | `ChemUnitQuantity`, `ChemQuantityValidator`, `units_for_dimension`, `ureg` |
 | `chemunited_core.compounds` | Inventory payload objects | `VolumeContentBase` |
 
 ## Component Catalog
@@ -188,11 +188,13 @@ These objects live in `chemunited_core.components.internals` and are populated b
 
 ## Units and Quantities
 
-`chemunited-core` uses Pint-backed quantities through `ChemUnitQuantity`.
+`chemunited-core` uses Pint-backed quantities from the
+`chemunited-quantities` package.
 
 - Mode fields accept strings such as `"5 ml/min"`, `"250 ml"`, `"1.2 bar"`, or `"500 mm"`.
 - Runtime helpers such as `flow_rate_si`, `setpoint_pa`, `length_value`, `diameter_value`, and `capacity_value` expose SI magnitudes where needed.
-- Shared unit conversions should use `chemunited_core.utils.ureg`.
+- Import `ChemUnitQuantity`, `ChemQuantityValidator`, `units_for_dimension`, and
+  the shared `ureg` directly from `chemunited_quantities`.
 
 ## Examples
 

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Annotated
 
 import numpy as np
+from chemunited_quantities import ChemQuantityValidator, ChemUnitQuantity
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
 from ..common.constant import AMBIENT_TEMPERATURE_K, ATMOSPHERE_PRESSURE_PA
@@ -10,7 +11,6 @@ from ..common.enums import ConnectionType, GroupParameterCategory, PhaseKind
 from ..common.metadata import Element
 from ..compounds.entity import IDEAL_GAS_CONSTANT
 from ..compounds.pockets import VolumeContentBase
-from ..utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 
 
 # Pydantic for validation

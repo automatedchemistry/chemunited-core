@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Annotated, ClassVar
 
+from chemunited_quantities import ChemQuantityValidator, ChemUnitQuantity
 from pydantic import Field
 from typing_extensions import override
 
@@ -18,7 +19,6 @@ from chemunited_core.components import (
 from chemunited_core.components.enums import ComponentType, InternalEdgeRole
 from chemunited_core.components.internals import InternalEdge, InventoryNode, Port
 from chemunited_core.compounds import VolumeContentBase
-from chemunited_core.utils.internal_quantity import ChemQuantityValidator, ChemUnitQuantity
 
 CELL_SIZE = 40
 ROW_HEADER_WIDTH = 12

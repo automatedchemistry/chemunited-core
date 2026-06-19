@@ -1,4 +1,9 @@
 import pytest
+from chemunited_quantities import (
+    ChemUnitQuantity,
+    units_for_dimension,
+    ureg,
+)
 from pydantic import ValidationError
 
 from chemunited_core.common.enums import PhaseKind
@@ -7,11 +12,6 @@ from chemunited_core.compounds import (
     ChemicalEntity,
     Compounds,
     VolumeContentBase,
-)
-from chemunited_core.utils.internal_quantity import (
-    ChemUnitQuantity,
-    units_for_dimension,
-    ureg,
 )
 
 

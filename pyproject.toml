@@ -13,8 +13,8 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "chemunited-quantities>=0.0.2",
     "pydantic>=2.0",
-    "pydantic-pint>=0.3",
     "pint>=0.23",
     "numpy>=1.26",
     "loguru>=0.7",

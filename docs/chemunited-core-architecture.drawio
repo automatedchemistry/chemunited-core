@@ -25,7 +25,7 @@
                 <mxCell id="internals" value="chemunited_core.components.internals&#xa;&#xa;Compiled topology objects&#xa;- Port&#xa;- InternalEdge&#xa;- InventoryNode&#xa;&#xa;Read by graph, GUI, and simulation layers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e1f5;strokeColor=#6c8ebf;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="810" y="155" width="260" height="190" as="geometry"/>
                 </mxCell>
-                <mxCell id="quantities" value="chemunited_core.utils&#xa;&#xa;- ChemUnitQuantity&#xa;- ChemQuantityValidator&#xa;- shared ureg&#xa;&#xa;Mode inputs can be strings like 250 ml, 1.2 bar, or 500 mm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" parent="1" vertex="1">
+                <mxCell id="quantities" value="chemunited_quantities&#xa;&#xa;- ChemUnitQuantity&#xa;- ChemQuantityValidator&#xa;- units_for_dimension&#xa;- shared ureg&#xa;&#xa;Mode inputs can be strings like 250 ml, 1.2 bar, or 500 mm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="810" y="380" width="260" height="170" as="geometry"/>
                 </mxCell>
                 <mxCell id="compounds" value="chemunited_core.compounds&#xa;&#xa;- VolumeContentBase&#xa;&#xa;Used by InventoryNode to store initial gas and liquid inventory state" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;" parent="1" vertex="1">

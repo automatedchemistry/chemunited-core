@@ -1,9 +1,7 @@
 import uuid
 from typing import Any, Literal, Self, Type
 
-from chemunited_core.utils.internal_quantity import (
-    ChemUnitQuantity,  # type: ignore[import-not-found]
-)
+from chemunited_quantities import ChemUnitQuantity
 from pydantic import BaseModel, Field
 
 

@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from chemunited_core.utils.internal_quantity import (
+from chemunited_quantities import (
     ChemQuantityValidator,
     ChemUnitQuantity,
 )

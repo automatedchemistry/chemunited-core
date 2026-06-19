@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from typing import Annotated
 
+from chemunited_quantities import (
+    ChemQuantityValidator,
+    ChemUnitQuantity,
+)
 from pint.errors import DimensionalityError
 from pydantic import Field
 from typing_extensions import override
@@ -9,10 +13,6 @@ from chemunited_core.common.enums import ConnectionType, GroupParameterCategory
 from chemunited_core.components import ComponentMode, NeutralComponentData
 from chemunited_core.components.command import PutResult
 from chemunited_core.components.internals import Port
-from chemunited_core.utils.internal_quantity import (
-    ChemQuantityValidator,
-    ChemUnitQuantity,
-)
 
 
 def _temperature_quantity(value: object) -> ChemUnitQuantity:

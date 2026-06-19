@@ -14,6 +14,10 @@ from dataclasses import dataclass
 from typing import Annotated, ClassVar
 
 import numpy as np
+from chemunited_quantities import (
+    ChemQuantityValidator,
+    ChemUnitQuantity,
+)
 from pydantic import Field, field_validator
 from typing_extensions import override
 
@@ -24,10 +28,6 @@ from chemunited_core.common.enums import (
     PhaseKind,
 )
 from chemunited_core.compounds import VolumeContentBase
-from chemunited_core.utils.internal_quantity import (
-    ChemQuantityValidator,
-    ChemUnitQuantity,
-)
 
 from .component import ComponentData, ComponentMode
 from .enums import BoundaryConditionKind, ComponentType, InternalEdgeRole, PortAccess
