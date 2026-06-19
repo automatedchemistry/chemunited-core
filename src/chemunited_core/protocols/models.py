@@ -36,6 +36,10 @@ class CommandSignature(BaseModel):
         description="The expected answer from the feedback status command to consider the action successful.",
         json_schema_extra={"group": "Execution Options"}
     )
+    param_refs: dict[str, str] = Field(
+        default_factory=dict,
+        json_schema_extra={"visible": False, "editable": False},
+    )
 
     @property
     def resume_id(self) -> str:
@@ -54,7 +58,14 @@ class CommandSignature(BaseModel):
             if name not in base_fields
         }
 
-    _SCRIPT_EXCLUDED = frozenset({"id", "component", "command", "method"})
+    _SCRIPT_EXCLUDED = frozenset({"id", "component", "command", "method", "param_refs"})
+
+    def _fmt_param(self, name: str, value: Any) -> str:
+        if name in self.param_refs:
+            return f"{name}={self.param_refs[name]}"
+        if isinstance(value, ChemUnitQuantity):
+            return f'{name}="{value}"'
+        return f"{name}={value!r}"
 
     @property
     def line_script(self) -> str:
@@ -68,11 +79,7 @@ class CommandSignature(BaseModel):
             if n in base_fields and n not in self._SCRIPT_EXCLUDED
         }
         parameters = ", ".join(
-            (
-                f'{name}="{value}"'
-                if isinstance(value, ChemUnitQuantity)
-                else f"{name}={value!r}"
-            )
+            self._fmt_param(name, value)
             for name, value in {**params, **base_kwargs}.items()
         )
         if parameters:
