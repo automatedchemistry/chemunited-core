@@ -74,7 +74,7 @@ class ValvesProtocols(ComponentProtocol):
 
     @classmethod
     def _load_port_topology(cls) -> tuple[list[tuple], list[tuple]]:
-        import chemunited_core.components.valve as rv_module
+        import chemunited_core.figure_registry.rotary_valve as rv_module
 
         try:
             data = load_class(
@@ -85,7 +85,8 @@ class ValvesProtocols(ComponentProtocol):
             logger.debug(f"Falling back to default topology for {cls.__name__}: {exc}")
             data = None
         if data is not None:
-            return data.stator_ports, data.rotor_ports
+            instance = data()
+            return instance.stator_ports, instance.rotor_ports
         return cls.STATOR_PORTS, cls.ROTOR_PORTS
 
     def __init__(self, name: str) -> None:
@@ -156,5 +157,5 @@ class SolenoidValve2WayProtocols(SolenoidValveProtocols): ...
 
 
 if __name__ == "__main__":
-    valve = ThreePortFourPositionValveProtocols("test")
-    print(valve.commands)
+    valve = SixteenPortDistributionValveProtocols("test")
+    print(valve.commands["position"].__dict__["__pydantic_fields__"]["connect"])
