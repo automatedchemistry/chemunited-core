@@ -69,7 +69,7 @@ jobs:
 
   publish-testpypi:
     name: Publish to TestPyPI
-    needs: build
+    needs: github-release
     runs-on: ubuntu-latest
     environment: testpypi
     permissions:
@@ -91,7 +91,7 @@ jobs:
 
   github-release:
     name: Create GitHub Release
-    needs: publish-testpypi
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -121,7 +121,7 @@ jobs:
 
   publish-pypi:
     name: Publish to PyPI
-    needs: github-release
+    needs: publish-testpypi
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
