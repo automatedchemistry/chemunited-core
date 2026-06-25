@@ -39,6 +39,7 @@ class TemperatureControlProtocols(ComponentProtocol):
         super().__init__(name)
         self.commands["temperature"] = GetTemperatureParameter
         self.commands["target-reached"] = TargetTemperatureReachedParameter
+        self.commands["set_temperature"] = SetTemperatureParameter
         self.commands["set-temperature"] = SetTemperatureParameter
 
         # TODO: feedback command (poll target-reached after set_temperature)

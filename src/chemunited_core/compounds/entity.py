@@ -16,7 +16,7 @@ from chemunited_quantities import (
     ChemQuantityValidator,
     ChemUnitQuantity,
 )
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
 
 from chemunited_core.common.enums import GroupParameterCategory
 
@@ -31,6 +31,8 @@ def _quantity_with_default_unit(value: object, unit: str) -> object:
 
 class ChemicalEntity(BaseModel):
     """Static descriptor for a pure chemical substance."""
+
+    _color: str = PrivateAttr(default="#00000000")
 
     name: Annotated[
         str,
@@ -186,30 +188,40 @@ class ChemicalEntity(BaseModel):
             f"{self.color_blue:02X}{self.color_alpha:02X}"
         )
 
-    def molar_volume_gas(self, temperature: float, pressure: float) -> float:
-        """Ideal-gas molar volume in m³/mol."""
-        return IDEAL_GAS_CONSTANT * temperature / pressure
+    @property
+    def color(self) -> str:
+        """Return the non-serialized color used by legacy GUI callers."""
+        return self._color
 
-    def molar_volume_liquid(self) -> float:
+    @color.setter
+    def color(self, value: str) -> None:
+        if not isinstance(value, str) or not value.startswith("#") or len(value) != 9:
+            raise ValueError("color must be an eight-digit '#RRGGBBAA' hex value.")
+        int(value[1:], 16)
+        self._color = value
+
+    def molar_volume_gas(self, temperature: float, pressure: float) -> ChemUnitQuantity:
+        """Ideal-gas molar volume in m³/mol."""
+        return ChemUnitQuantity(IDEAL_GAS_CONSTANT * temperature / pressure, "m^3/mol")
+
+    def molar_volume_liquid(self) -> ChemUnitQuantity:
         """Liquid molar volume in m³/mol derived from density."""
         if self.density_liquid <= ChemUnitQuantity("0 kg/m^3"):
             raise ValueError(
                 f"density_liquid is not defined for compound '{self.name}'."
             )
-        return float(
-            (self.molecular_weight / self.density_liquid).to("m^3/mol").magnitude
-        )
+        return (self.molecular_weight / self.density_liquid).to("m^3/mol")
 
-    def cp(self, phase: str) -> float:
+    def cp(self, phase: str) -> ChemUnitQuantity:
         """Molar heat capacity in J/(mol·K) for the requested phase."""
         if phase == "liquid":
             if self.cp_liquid <= ChemUnitQuantity("0 J/(mol*K)"):
                 raise ValueError(
                     f"cp_liquid is not defined for compound '{self.name}'."
                 )
-            return float(self.cp_liquid.magnitude)
+            return self.cp_liquid
         if phase == "gas":
             if self.cp_gas <= ChemUnitQuantity("0 J/(mol*K)"):
                 raise ValueError(f"cp_gas is not defined for compound '{self.name}'.")
-            return float(self.cp_gas.magnitude)
+            return self.cp_gas
         raise ValueError(f"Unknown phase '{phase}'. Expected 'liquid' or 'gas'.")

@@ -2,6 +2,7 @@ from dataclasses import dataclass as _dataclass
 from dataclasses import field as _field
 from importlib.resources import files as _pkg_files
 from importlib.resources.abc import Traversable
+from typing import Iterator
 
 from chemunited_core.components import (
     BackPressureRegulatorData,
@@ -117,6 +118,11 @@ class ComponentDefinition:
     svg_rotation: float = 0.0
     port_positions: dict[int, tuple[float, float]] = _field(default_factory=dict)
     category: str = ""
+
+    def __iter__(self) -> Iterator[type[ComponentData] | type[ComponentMode]]:
+        """Allow legacy tuple unpacking into data and mode classes."""
+        yield self.data_class
+        yield self.mode_class
 
 
 __all__ = [
