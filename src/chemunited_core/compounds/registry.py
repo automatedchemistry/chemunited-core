@@ -31,7 +31,13 @@ from chemunited_core.common.enums import PhaseKind
 from .entity import ChemicalEntity
 from .pockets import VolumeContentBase
 
-_AIR = ChemicalEntity()
+_AIR = ChemicalEntity(
+    name="air",
+    color_red=0,
+    color_green=0,
+    color_blue=0,
+    color_alpha=0,
+)
 _AIR_SPECIES = "air"
 _TRANSPARENT_COLOR = "#FFFFFF00"
 
@@ -142,7 +148,7 @@ class Compounds:
         if total_moles == 0:
             return _TRANSPARENT_COLOR
 
-        r_total, g_total, b_total = 0, 0, 0
+        r_total, g_total, b_total = 0.0, 0.0, 0.0
         for species, moles in visible_species.items():
             entity = self._compounds[species]
             r, g, b = self._hex_to_rgb(entity.rgb_hex)
@@ -170,6 +176,7 @@ class Compounds:
             int(color[3:5], 16),
             int(color[5:7], 16),
         )
+
 
 # ── Module-level singleton ────────────────────────────────────────────────────
 

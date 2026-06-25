@@ -231,7 +231,8 @@ class ComponentData(Element):
         """
         return PutResult()
 
-    def get(self, command: str, **kwargs) -> None: ...
+    def get(self, command: str, **kwargs) -> object | None:
+        return None
 
 
 @dataclass

@@ -1,6 +1,7 @@
-from dataclasses import dataclass as _dataclass, field as _field
-from importlib.resources.abc import Traversable
+from dataclasses import dataclass as _dataclass
+from dataclasses import field as _field
 from importlib.resources import files as _pkg_files
+from importlib.resources.abc import Traversable
 
 from chemunited_core.components import (
     BackPressureRegulatorData,
@@ -73,10 +74,10 @@ from chemunited_core.figure_registry.technical import (
     StirringControlMode,
 )
 from chemunited_core.figure_registry.thermal import (
-    PeltierCoolerTemperatureControlData,
-    PeltierCoolerTemperatureControlMode,
     HeiConnectTemperatureControlData,
     HeiConnectTemperatureControlMode,
+    PeltierCoolerTemperatureControlData,
+    PeltierCoolerTemperatureControlMode,
     TemperatureControlData,
     TemperatureControlMode,
 )
@@ -91,6 +92,7 @@ from chemunited_core.figure_registry.vessels import (
     VialMode,
 )
 
+
 @_dataclass(frozen=True)
 class ComponentDefinition:
     """Canonical definition for a figure in the registry.
@@ -98,11 +100,14 @@ class ComponentDefinition:
     data_class:     runtime data container for this component type.
     mode_class:     user-editable parameter schema.
     figure_base:    primary SVG asset name (without .svg). Empty = same as the dict key.
-    svg_scale:      multiplier applied to PATTERN_DIMENSION when rendering the primary SVG.
+    svg_scale:      multiplier applied to PATTERN_DIMENSION when rendering
+                    the primary SVG.
     svg_rotation:   degrees to rotate the primary SVG after loading (0 = no rotation).
-    port_positions: visual (x, y) overrides for port connection points, keyed by port number.
+    port_positions: visual (x, y) overrides for port connection points,
+                    keyed by port number.
                     Empty = use the data class internal_structure() defaults.
-    category:       palette grouping for frontend organisation (e.g. "pipes", "sensors").
+    category:       palette grouping for frontend organisation
+                    (e.g. "pipes", "sensors").
     """
 
     data_class: type[ComponentData]
@@ -210,190 +215,302 @@ def list_figures() -> list[str]:
 COMPONENTS: dict[str, ComponentDefinition] = {
     # analytics
     "HPLCControl": ComponentDefinition(
-        ComponentData, ComponentMode,
-        figure_base="HPLC", svg_scale=4.0,
-        port_positions={1: (-55, 80), 2: (55, 80)}, category="analytics",
+        ComponentData,
+        ComponentMode,
+        figure_base="HPLC",
+        svg_scale=4.0,
+        port_positions={1: (-55, 80), 2: (55, 80)},
+        category="analytics",
     ),
     "IRControl": ComponentDefinition(
-        ComponentData, ComponentMode,
-        port_positions={1: (-10, -2), 2: (10, -2)}, category="analytics",
+        ComponentData,
+        ComponentMode,
+        port_positions={1: (-10, -2), 2: (10, -2)},
+        category="analytics",
     ),
     "MSControl": ComponentDefinition(
-        ComponentData, ComponentMode,
-        port_positions={1: (-40, -40), 2: (-25, -40)}, category="analytics",
+        ComponentData,
+        ComponentMode,
+        port_positions={1: (-40, -40), 2: (-25, -40)},
+        category="analytics",
     ),
     "NMRControl": ComponentDefinition(
-        ComponentData, ComponentMode,
-        port_positions={1: (-28, -10), 2: (28, -10)}, category="analytics",
+        ComponentData,
+        ComponentMode,
+        port_positions={1: (-28, -10), 2: (28, -10)},
+        category="analytics",
     ),
     # assembly
     "Gantry3D": ComponentDefinition(
-        Gantry3DData, Gantry3DMode,
-        svg_scale=4.0, category="assembly",
+        Gantry3DData,
+        Gantry3DMode,
+        svg_scale=4.0,
+        category="assembly",
     ),
-    "LengthControl": ComponentDefinition(NeutralComponentData, ComponentMode, category="assembly"),
+    "LengthControl": ComponentDefinition(
+        NeutralComponentData, ComponentMode, category="assembly"
+    ),
     # pipes
     "BackPressureRegulator": ComponentDefinition(
-        BackPressureRegulatorData, BackPressureRegulatorMode,
-        port_positions={1: (-50, 28), 2: (50, 28)}, category="pipes",
+        BackPressureRegulatorData,
+        BackPressureRegulatorMode,
+        port_positions={1: (-50, 28), 2: (50, 28)},
+        category="pipes",
     ),
-    "Distributor": ComponentDefinition(JunctionData, JunctionMode, svg_scale=0.1, category="pipes"),
+    "Distributor": ComponentDefinition(
+        JunctionData, JunctionMode, svg_scale=0.1, category="pipes"
+    ),
     "MFCComponent": ComponentDefinition(
-        MFCComponentData, MassFlowControllerMode,
+        MFCComponentData,
+        MassFlowControllerMode,
         figure_base="MassFlowControl",
-        port_positions={1: (-45, 35), 2: (45, 35)}, category="pipes",
+        port_positions={1: (-45, 35), 2: (45, 35)},
+        category="pipes",
     ),
     "Sink": ComponentDefinition(
-        SinkData, SinkMode,
-        figure_base="SourceSink", svg_scale=1.0,
-        port_positions={1: (-20, 0)}, category="pipes",
+        SinkData,
+        SinkMode,
+        figure_base="SourceSink",
+        svg_scale=1.0,
+        port_positions={1: (-20, 0)},
+        category="pipes",
     ),
     "Source": ComponentDefinition(
-        SourceData, SourceMode,
-        figure_base="SourceSink", svg_scale=1.0, svg_rotation=180.0,
-        port_positions={1: (20, 0)}, category="pipes",
+        SourceData,
+        SourceMode,
+        figure_base="SourceSink",
+        svg_scale=1.0,
+        svg_rotation=180.0,
+        port_positions={1: (20, 0)},
+        category="pipes",
     ),
     "Separator": ComponentDefinition(
-        SeparatorData, SeparatorMode,
-        port_positions={1: (-40, -26), 2: (-40, 3)}, category="pipes",
+        SeparatorData,
+        SeparatorMode,
+        port_positions={1: (-40, -26), 2: (-40, 3)},
+        category="pipes",
     ),
     # pumps
     "HPLCPump": ComponentDefinition(
-        HPLCPumpData, PumpMode,
-        port_positions={1: (14, 33), 2: (35, 33)}, category="pumps",
+        HPLCPumpData,
+        PumpMode,
+        port_positions={1: (14, 33), 2: (35, 33)},
+        category="pumps",
     ),
     "SyringePump": ComponentDefinition(
-        SyringePumpData, SyringePumpMode,
+        SyringePumpData,
+        SyringePumpMode,
         figure_base="SyringeBarrel",
-        port_positions={1: (-50, 11.5)}, category="pumps",
+        port_positions={1: (-50, 11.5)},
+        category="pumps",
     ),
     # sensors
     "FlowMeter": ComponentDefinition(ComponentData, ComponentMode, category="sensors"),
     "PhidgetBubbleSensorComponent": ComponentDefinition(
-        ComponentData, ComponentMode,
+        ComponentData,
+        ComponentMode,
         figure_base="BubbleSensor",
-        port_positions={1: (-48, 7), 2: (48, 7)}, category="sensors",
+        port_positions={1: (-48, 7), 2: (48, 7)},
+        category="sensors",
     ),
     "PhidgetBubbleSensorPowerComponent": ComponentDefinition(
-        NeutralComponentData, ComponentMode,
-        figure_base="Power", svg_scale=0.8, category="sensors",
+        NeutralComponentData,
+        ComponentMode,
+        figure_base="Power",
+        svg_scale=0.8,
+        category="sensors",
     ),
     "PhotoSensor": ComponentDefinition(
-        NeutralComponentData, ComponentMode,
-        svg_scale=0.5, category="sensors",
+        NeutralComponentData,
+        ComponentMode,
+        svg_scale=0.5,
+        category="sensors",
     ),
     "PressureControl": ComponentDefinition(
-        PressureControlData, PressureControlMode,
-        port_positions={1: (40, 26)}, category="sensors",
+        PressureControlData,
+        PressureControlMode,
+        port_positions={1: (40, 26)},
+        category="sensors",
     ),
     "PressureSensor": ComponentDefinition(
-        ComponentData, ComponentMode,
-        port_positions={1: (48, 35), 2: (-48, 35)}, category="sensors",
+        ComponentData,
+        ComponentMode,
+        port_positions={1: (48, 35), 2: (-48, 35)},
+        category="sensors",
     ),
     # technical
     "MultiChannelADC": ComponentDefinition(
-        MultiChannelData, MultiChannelMode,
-        figure_base="ADC", svg_scale=0.8, category="technical",
+        MultiChannelData,
+        MultiChannelMode,
+        figure_base="ADC",
+        svg_scale=0.8,
+        category="technical",
     ),
     "MultiChannelDAC": ComponentDefinition(
-        MultiChannelData, MultiChannelMode,
-        figure_base="DAC", svg_scale=0.8, category="technical",
+        MultiChannelData,
+        MultiChannelMode,
+        figure_base="DAC",
+        svg_scale=0.8,
+        category="technical",
     ),
     "MultiChannelRelay": ComponentDefinition(
-        MultiChannelData, MultiChannelMode,
-        figure_base="Relay", svg_scale=0.8, category="technical",
+        MultiChannelData,
+        MultiChannelMode,
+        figure_base="Relay",
+        svg_scale=0.8,
+        category="technical",
     ),
     "PowerControl": ComponentDefinition(
-        NeutralComponentData, ComponentMode,
-        figure_base="Power", svg_scale=0.8, category="technical",
+        NeutralComponentData,
+        ComponentMode,
+        figure_base="Power",
+        svg_scale=0.8,
+        category="technical",
     ),
     "PowerSwitch": ComponentDefinition(
-        NeutralComponentData, ComponentMode,
-        figure_base="Power", svg_scale=0.8, category="technical",
+        NeutralComponentData,
+        ComponentMode,
+        figure_base="Power",
+        svg_scale=0.8,
+        category="technical",
     ),
     "StirringControl": ComponentDefinition(
-        StirringControlData, StirringControlMode,
-        figure_base="Stirring", svg_scale=2.0, category="technical",
+        StirringControlData,
+        StirringControlMode,
+        figure_base="Stirring",
+        svg_scale=2.0,
+        category="technical",
     ),
     # thermal
     "HeiConnectTemperatureControl": ComponentDefinition(
-        HeiConnectTemperatureControlData, HeiConnectTemperatureControlMode,
-        figure_base="PT100", svg_scale=2.0, category="thermal",
+        HeiConnectTemperatureControlData,
+        HeiConnectTemperatureControlMode,
+        figure_base="PT100",
+        svg_scale=2.0,
+        category="thermal",
     ),
     "PeltierCoolerTemperatureControl": ComponentDefinition(
-        PeltierCoolerTemperatureControlData, PeltierCoolerTemperatureControlMode,
-        figure_base="Peltier", svg_scale=2.0, category="thermal",
+        PeltierCoolerTemperatureControlData,
+        PeltierCoolerTemperatureControlMode,
+        figure_base="Peltier",
+        svg_scale=2.0,
+        category="thermal",
     ),
     "TemperatureControl": ComponentDefinition(
-        TemperatureControlData, TemperatureControlMode,
-        figure_base="Chiller", category="thermal",
+        TemperatureControlData,
+        TemperatureControlMode,
+        figure_base="Chiller",
+        category="thermal",
     ),
     # valve — rotary
     "FourPortDistributionValve": ComponentDefinition(
-        FourPortDistributionValveData, FourPortDistributionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        FourPortDistributionValveData,
+        FourPortDistributionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "FourPortFivePositionValve": ComponentDefinition(
-        FourPortFivePositionValveData, FourPortFivePositionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        FourPortFivePositionValveData,
+        FourPortFivePositionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "SixPortDistributionValve": ComponentDefinition(
-        SixPortDistributionValveData, SixPortDistributionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        SixPortDistributionValveData,
+        SixPortDistributionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "SixPortTwoPositionValve": ComponentDefinition(
-        SixPortTwoPositionValveData, SixPortTwoPositionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        SixPortTwoPositionValveData,
+        SixPortTwoPositionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "SixteenPortDistributionValve": ComponentDefinition(
-        SixteenPortDistributionValveData, SixteenPortDistributionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        SixteenPortDistributionValveData,
+        SixteenPortDistributionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "ThreePortFourPositionValve": ComponentDefinition(
-        ThreePortFourPositionValveData, ThreePortFourPositionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        ThreePortFourPositionValveData,
+        ThreePortFourPositionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "ThreePortTwoPositionValve": ComponentDefinition(
-        ThreePortTwoPositionValveData, ThreePortTwoPositionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        ThreePortTwoPositionValveData,
+        ThreePortTwoPositionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "TwelvePortDistributionValve": ComponentDefinition(
-        TwelvePortDistributionValveData, TwelvePortDistributionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        TwelvePortDistributionValveData,
+        TwelvePortDistributionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     "TwoPortDistributionValve": ComponentDefinition(
-        TwoPortDistributionValveData, TwoPortDistributionValveMode,
-        figure_base="RotaryValve", svg_scale=4.0, category="valve",
+        TwoPortDistributionValveData,
+        TwoPortDistributionValveMode,
+        figure_base="RotaryValve",
+        svg_scale=4.0,
+        category="valve",
     ),
     # valve — solenoid
     "SolenoidValve": ComponentDefinition(
-        SolenoidValveData, SolenoidValveMode,
-        svg_scale=1.0, category="valve",
+        SolenoidValveData,
+        SolenoidValveMode,
+        svg_scale=1.0,
+        category="valve",
     ),
     "SolenoidValve2Way": ComponentDefinition(
-        SolenoidValve2WayData, Solenoid2WayValveMode,
-        svg_scale=1.0, category="valve",
+        SolenoidValve2WayData,
+        Solenoid2WayValveMode,
+        svg_scale=1.0,
+        category="valve",
     ),
     # vessels
-    "CustomFlask": ComponentDefinition(VesselComponentData, VesselMode, category="vessel"),
-    "FlowReactor": ComponentDefinition(
-        FlowReactorData, FlowReactorMode,
-        figure_base="FlowReactorBase",
-        port_positions={1: (-45, -20), 2: (45, -20)}, category="vessel",
+    "CustomFlask": ComponentDefinition(
+        VesselComponentData, VesselMode, category="vessel"
     ),
-    "GlassBottle": ComponentDefinition(GlassBottleData, GlassBottleMode, category="vessel"),
+    "FlowReactor": ComponentDefinition(
+        FlowReactorData,
+        FlowReactorMode,
+        figure_base="FlowReactorBase",
+        port_positions={1: (-45, -20), 2: (45, -20)},
+        category="vessel",
+    ),
+    "GlassBottle": ComponentDefinition(
+        GlassBottleData, GlassBottleMode, category="vessel"
+    ),
     "Loop": ComponentDefinition(
-        PlugFlowComponentData, PlugFlowMode,
+        PlugFlowComponentData,
+        PlugFlowMode,
         figure_base="LoopBase",
-        port_positions={1: (-50, -5), 2: (50, -5)}, category="vessel",
+        port_positions={1: (-50, -5), 2: (50, -5)},
+        category="vessel",
     ),
     "PhotoReactor": ComponentDefinition(
-        PhotoReactorData, PhotoReactorMode,
+        PhotoReactorData,
+        PhotoReactorMode,
         figure_base="FlowReactorBase",
-        port_positions={1: (-45, -20), 2: (45, -20)}, category="vessel",
+        port_positions={1: (-45, -20), 2: (45, -20)},
+        category="vessel",
     ),
     "Vial": ComponentDefinition(
-        VialData, VialMode,
-        port_positions={1: (0, -11), 2: (0, 10)}, category="vessel",
+        VialData,
+        VialMode,
+        port_positions={1: (0, -11), 2: (0, 10)},
+        category="vessel",
     ),
 }

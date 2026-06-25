@@ -196,7 +196,9 @@ class ChemicalEntity(BaseModel):
             raise ValueError(
                 f"density_liquid is not defined for compound '{self.name}'."
             )
-        return float((self.molecular_weight / self.density_liquid).to("m^3/mol").magnitude)
+        return float(
+            (self.molecular_weight / self.density_liquid).to("m^3/mol").magnitude
+        )
 
     def cp(self, phase: str) -> float:
         """Molar heat capacity in J/(mol·K) for the requested phase."""

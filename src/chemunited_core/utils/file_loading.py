@@ -2,6 +2,7 @@ import importlib.util
 import sys
 from pathlib import Path
 
+
 def _module_name_for_path(file_path: Path, fallback: str) -> str:
     resolved = file_path.resolve()
     parts = list(resolved.parts)

@@ -15,26 +15,29 @@ class CommandSignature(BaseModel):
         ge=0.0,
         title="Wait time after command execution",
         description="Time in seconds to wait after executing the command.",
-        json_schema_extra={"group": "Execution Options"}
+        json_schema_extra={"group": "Execution Options"},
     )
     wait_feedback_status: bool = Field(
         default=False,
         title="Wait for feedback status",
         description="Whether to wait for a feedback status command before proceeding.",
-        json_schema_extra={"group": "Execution Options"}
+        json_schema_extra={"group": "Execution Options"},
     )
     feedback_status_command: str = Field(
         default="",
         title="Feedback Status Command",
         description="The command to use for checking feedback status.",
-        json_schema_extra={"group": "Execution Options"}
+        json_schema_extra={"group": "Execution Options"},
     )
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:6])
     feedback_answer: str = Field(
         default="true",
         title="Expected Feedback Answer",
-        description="The expected answer from the feedback status command to consider the action successful.",
-        json_schema_extra={"group": "Execution Options"}
+        description=(
+            "The expected answer from the feedback status command to consider "
+            "the action successful."
+        ),
+        json_schema_extra={"group": "Execution Options"},
     )
     param_refs: dict[str, str] = Field(
         default_factory=dict,
@@ -90,7 +93,7 @@ class CommandSignature(BaseModel):
         return f"self.platform[{self.component!r}].{method}({self.command!r})"
 
     def validate_feedback_answer(self, answer: Any) -> bool:
-        return answer == self.feedback_answer
+        return bool(answer == self.feedback_answer)
 
 
 class ComponentProtocol:

@@ -1,4 +1,5 @@
 """Functional tests for chemunited_core.protocols."""
+
 from __future__ import annotations
 
 import pytest
@@ -6,7 +7,6 @@ from chemunited_quantities import ChemUnitQuantity
 
 from chemunited_core.protocols import (
     CommandSignature,
-    ComponentProtocol,
     HPLCControlProtocols,
     HPLCPumpProtocols,
     MFCComponentProtocols,

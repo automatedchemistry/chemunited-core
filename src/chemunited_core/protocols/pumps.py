@@ -31,7 +31,7 @@ class InfuseParameter(CommandSignature):
         default="is-pumping",
         title="Feedback Status Command",
         description="The command to use for checking feedback status.",
-        json_schema_extra={"group": "Execution Options"}
+        json_schema_extra={"group": "Execution Options"},
     )
 
 
@@ -71,9 +71,8 @@ class WithdrawParameter(CommandSignature):
         default="is-pumping",
         title="Feedback Status Command",
         description="The command to use for checking feedback status.",
-        json_schema_extra={"group": "Execution Options"}
+        json_schema_extra={"group": "Execution Options"},
     )
-    
 
     @field_validator("rate")
     @classmethod

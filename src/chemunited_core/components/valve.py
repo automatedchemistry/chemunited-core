@@ -22,7 +22,6 @@ from pydantic import Field
 from typing_extensions import override
 
 from chemunited_core.common.constant import PATTERN_DIMENSION
-
 from chemunited_core.components.component import ComponentData, ComponentMode
 from chemunited_core.components.enums import ComponentType, InternalEdgeRole
 from chemunited_core.components.internals import InternalEdge, Port

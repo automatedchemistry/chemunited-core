@@ -28,9 +28,7 @@ def _dimensions(unit: str):
         ("rpm", ["rpm"]),
     ],
 )
-def test_quantity_units_for_curated_dimensions(
-    unit: str, expected: list[str]
-) -> None:
+def test_quantity_units_for_curated_dimensions(unit: str, expected: list[str]) -> None:
     assert units_for_dimension(_dimensions(unit), ureg) == expected
 
 

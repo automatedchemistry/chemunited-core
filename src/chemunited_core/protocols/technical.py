@@ -88,7 +88,9 @@ class SetHeatingMode(CommandSignature):
 class GetTemperatureControlMode(CommandSignature):
     command: str = "temperature-control-mode"
     method: Literal["GET", "PUT"] = "GET"
-    description: str = "Get the current temperature control mode (hotplate or external probe)"
+    description: str = (
+        "Get the current temperature control mode (hotplate or external probe)"
+    )
 
 
 class HeiConnectTemperatureControlProtocols(TemperatureControlProtocols):

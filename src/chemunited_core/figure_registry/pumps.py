@@ -135,5 +135,3 @@ class SyringePumpData(FlowSourceData):
             return PutResult()
 
         return PutResult()
-
-

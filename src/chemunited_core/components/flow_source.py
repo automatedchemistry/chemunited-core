@@ -56,7 +56,7 @@ class FlowSourceMode(ComponentMode):
 
 @dataclass
 class FlowSourceData(ComponentData):
-    """Terminal flow source: barrel (Inventory) + nozzle (InternalEdge) + passive Port 1.
+    """Terminal flow source with a barrel, nozzle, and passive Port 1.
 
     Port 1 has no boundary condition — it is a passive node solved by the network.
     The Inventory node holds a FLOW BC (_inventory_bc) that drives fluid through the

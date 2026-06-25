@@ -17,15 +17,15 @@ from .sensors import (
     PressureSensorProtocols,
 )
 from .technical import (
+    HeiConnectTemperatureControlProtocols,
     LengthControlProtocols,
     MultiChannelADCProtocols,
     MultiChannelDACProtocols,
     MultiChannelRelayProtocols,
     PeltierCoolerTemperatureControlProtocols,
     PhotoReactorProtocols,
-    TemperatureControlProtocols,
     StirringControlProtocols,
-    HeiConnectTemperatureControlProtocols,
+    TemperatureControlProtocols,
 )
 from .valves import (
     FourPortDistributionValveProtocols,

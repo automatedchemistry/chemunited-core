@@ -44,11 +44,10 @@ class FlowReactorMode(PlugFlowMode):
         description="Operating temperature of the component.",
         json_schema_extra={
             "group": GroupParameterCategory.STATUS.value,
-        },       
-    )    
+        },
+    )
     heat_transfer_coefficient: Annotated[
-        ChemUnitQuantity,
-        ChemQuantityValidator("W/(m^2*K)")
+        ChemUnitQuantity, ChemQuantityValidator("W/(m^2*K)")
     ] = Field(
         default=ChemUnitQuantity("1000 W/(m^2*K)"),
         title="Heat Transfer Coefficient",
