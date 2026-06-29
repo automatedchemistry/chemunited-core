@@ -125,7 +125,7 @@ class ChemicalEntity(BaseModel):
     color_alpha: Annotated[
         int,
         Field(
-            default=0,
+            default=255,
             ge=0,
             le=255,
             title="Transparency",
